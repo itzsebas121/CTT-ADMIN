@@ -1,0 +1,13 @@
+export { default as CardCourse } from './CardCourse';
+export { default as CoursesList } from './CoursesList';
+export { default as CourseContent } from './CourseContent';
+export { default as CourseDates } from './CourseDates';
+export { default as CourseHeader } from './CourseHeader';
+export { default as CourseMaterials } from './CourseMaterials';
+export { default as CourseObjectives } from './CourseObjectives';
+export { default as CourseRequirements } from './CourseRequirements';
+export { default as CourseSidebar } from './CourseSidebar';
+export { default as StepContents } from './StepContents';
+export { default as StepGeneralData } from './StepGeneralData';
+export { default as StepImages } from './StepImages';
+export { default as StepRequirements } from './StepRequirements';
