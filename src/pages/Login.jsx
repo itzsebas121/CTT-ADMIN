@@ -30,12 +30,8 @@ export default function Login () {
 
       // Guardar token y datos del usuario con timestamp
       if (response.access_token) {
-        const userData = response.user || response.data || { email };
-        saveAuthData(response.access_token, userData);
+        saveAuthData(response.access_token);
       }
-
-      console.log('Usuario autenticado:', response);
-
       // Mostrar notificación de éxito
       toast.success('¡Inicio de sesión exitoso! Bienvenido', {
         position: "top-right",

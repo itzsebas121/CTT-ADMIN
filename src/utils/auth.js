@@ -2,6 +2,8 @@
  * Verifica si el usuario está autenticado
  * @returns {boolean} True si existe un token válido
  */
+import { UserMinusIcon } from "@heroicons/react/24/outline";
+import { jwtDecode } from "jwt-decode";
 export const isAuthenticated = () => {
   const token = localStorage.getItem('token');
   const tokenTimestamp = localStorage.getItem('tokenTimestamp');
@@ -39,14 +41,14 @@ export const getToken = () => {
  * Obtiene los datos del usuario almacenados
  * @returns {Object|null} Los datos del usuario o null si no existen
  */
-export const getUserData = () => {
-  const userData = localStorage.getItem('userData');
-  return userData ? JSON.parse(userData) : null;
-};
 
-export const getUserName = () => {
-  const userData = localStorage.getItem('user');
-  return userData ? JSON.parse(userData) : null;
+export const getUserData = () => {
+  const token_aux = localStorage.getItem('token');
+  var decode
+  if (token_aux) {
+  decode = jwtDecode(token_aux);
+}
+  return decode ? decode: {username:"invitado", email: "no-email@example.com"};
 };
 
 /**
@@ -62,9 +64,8 @@ export const getUser = () => {
  * @param {string} token - El token JWT
  * @param {Object} userData - Los datos del usuario
  */
-export const saveAuthData = (token, userData) => {
+export const saveAuthData = (token) => {
   localStorage.setItem('token', token);
-  localStorage.setItem('userData', JSON.stringify(userData));
   localStorage.setItem('tokenTimestamp', Date.now().toString());
 };
 
@@ -73,7 +74,6 @@ export const saveAuthData = (token, userData) => {
  */
 export const clearAuthData = () => {
   localStorage.removeItem('token');
-  localStorage.removeItem('userData');
   localStorage.removeItem('tokenTimestamp');
 };
 

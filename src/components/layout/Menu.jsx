@@ -1,18 +1,18 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { dashboardMenuItems } from '../../constants/navigation'
-import { getUserName, clearAuthData } from '../../utils/auth'
+import { clearAuthData, getUserData } from '../../utils/auth'
 import { ConfirmDialog } from '../ui'
 import { toast } from 'react-toastify'
 
-export default function Menu ({ items }) {
+export default function Menu () {
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState(null)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const userData = getUserName()
+    const userData = getUserData()
     setUser(userData)
   }, [])
 
@@ -123,11 +123,11 @@ export default function Menu ({ items }) {
           <div className="p-4 border-t border-white/30">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#6C1313] font-bold text-xl">
-                {user.nombre?.charAt(0).toUpperCase() || user.first_name?.charAt(0).toUpperCase() || 'U'}
+                {user.username ? user.username.charAt(0).toUpperCase() : 'U'  }
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate">
-                  {user.first_name + " " + user.first_last_name || 'Usuario'}
+                  {user.username ||user.firstname + " " + user.lastname|| 'Usuario'}
                 </p>
                 <p className="text-xs text-white/80 truncate">
                   {user.email || ''}

@@ -2,10 +2,11 @@ import api from './api';
 
 /**
  * Inicia sesión de usuario
- * @param {string} username - Nombre de usuario
  * @param {string} password - Contraseña
+ * @param {string} username - Nombre de usuario
  * @returns {Promise<Object>} Datos del usuario autenticado o token
  */
+
 export const login = async (username, password) => {
   try {
     // Creamos los parámetros del cuerpo en formato x-www-form-urlencoded
