@@ -1,6 +1,18 @@
+import { useState } from "react"
+import CategoryCreation from "../ui/CategoryCreation"
 export default function StepGeneralData({ courseData, onChange, onArrayChange, onAddArrayItem, onRemoveArrayItem }) {
-  const categories = ['TICS', 'Educativo', 'Software', 'Electrónica', 'Congresos']
+  const [categories, setCategories] = useState(['TICS', 'Educativo', 'Software', 'Electrónica', 'Congresos'])
   const statuses = ['Activo', 'Cerrado']
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleAddCategory = () => {
+    setIsModalOpen(true)
+  }
+  const handleCreateCategory = (categoryData) => {
+    setCategories(prev=> [...prev, categoryData.name])
+    onChange('category', categoryData.name)
+    console.log('Nueva categoría creada:', categoryData)
+  }
 
   return (
     <div className="space-y-6">
@@ -42,9 +54,14 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
               ))}
             </select>
           </div>
+          <div className="flex justify-center">
+            <button className="mt-7 text-sm text-[#6C1313] hover:text-[#5a0f0f]" onClick={handleAddCategory}>
+              + Agregar Categoría
+            </button>
+          </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Estado *</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Estado del Curso*</label>
             <select
               value={courseData.status}
               onChange={(e) => onChange('status', e.target.value)}
@@ -108,6 +125,12 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
           placeholder={(i) => `Público ${i + 1}`}
         />
       </div>
+            {/* Modal para crear categoría */}
+      <CategoryCreation
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateCategory}
+      />
     </div>
   )
 }
