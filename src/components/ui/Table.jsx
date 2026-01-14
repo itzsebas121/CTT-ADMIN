@@ -176,7 +176,7 @@ export default function Table({
       </div>
 
       {/* Paginación dentro de Table */}
-      <div className="flex items-center justify-between mt-3">
+      <div className="flex items-center justify-between mt-3 flex-col">
         <div className="text-sm text-gray-700">
           {loading
             ? "Cargando..."
