@@ -6,7 +6,7 @@ export const useCourseData = (id, isEdit) => {
     course_data: {
       title: '',
       description: '',
-      category: 'TICS',
+      category_id: '',
       status: 'Activo',
       course_image: '',
       course_image_detail: '',
@@ -57,7 +57,7 @@ export const useCourseData = (id, isEdit) => {
           course_data: {
             title: loadedCourse.title || '',
             description: loadedCourse.description || '',
-            category: loadedCourse.category || 'TICS',
+            category_id: loadedCourse.category_id || 'TICS',
             status: loadedCourse.status
               ? (String(loadedCourse.status).toLowerCase() === 'activo'
                   ? 'Activo'

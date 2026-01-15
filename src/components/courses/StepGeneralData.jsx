@@ -1,16 +1,45 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import CategoryCreation from "../ui/CategoryCreation"
+import { getAllCategories } from "../../api/categories"
 export default function StepGeneralData({ courseData, onChange, onArrayChange, onAddArrayItem, onRemoveArrayItem }) {
-  const [categories, setCategories] = useState(['TICS', 'Educativo', 'Software', 'Electrónica', 'Congresos'])
+  const [categories, setCategories] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
   const statuses = ['Activo', 'Cerrado']
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoading(true);
+        const response = await getAllCategories();
+        const CategoriesArray=response.items || response;
+
+        const categoriesData = CategoriesArray.map(cat=>({
+          id: cat.id,
+          name: cat.name,
+        }))
+        setCategories(categoriesData);
+      }catch (error) {
+        console.error('Error al obtener categorías:', error);
+        setCategories(['TICS', 'Educativo', 'Software', 'Electrónica', 'Congresos']);
+      }finally {
+        setIsLoading(false);
+      }
+
+    }
+    fetchCategories();
+  }, [])
 
   const handleAddCategory = () => {
     setIsModalOpen(true)
   }
   const handleCreateCategory = (categoryData) => {
-    setCategories(prev=> [...prev, categoryData.name])
-    onChange('category', categoryData.name)
+    const newCategory = {
+      id: categoryData.id,
+      name: categoryData.name,
+    }
+    setCategories(prev=> [...prev, newCategory])
+    onChange('category_id', categoryData.id)
     console.log('Nueva categoría creada:', categoryData)
   }
 
@@ -45,12 +74,14 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría *</label>
             <select
-              value={courseData.category}
-              onChange={(e) => onChange('category', e.target.value)}
+              value={courseData.category_id}
+              {...console.log(courseData.category_id)}
+              onChange={(e) => onChange('category_id', e.target.value)}
+              disabled={isLoading}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent transition"
             >
               {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
           </div>

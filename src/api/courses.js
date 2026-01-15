@@ -122,6 +122,7 @@ export const createCourse = async (courseData) => {
                 'Authorization': `Bearer ${token}`
             }
         });
+        console.log('Datos enviados:', courseData);
         return response.data;
     } catch (error) {
         if (error.code === 'ECONNABORTED') {

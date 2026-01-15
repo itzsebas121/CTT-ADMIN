@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { createCategory } from "../../api/categories";
 const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    svgurl: "",
-    status: "",
+    svgurl: "hola",
+    status: "activo",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -13,23 +16,37 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
       [name]: value,
     }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      name: "",
-      description: "",
-      svgurl: "",
-      status: "",
-    });
-    onClose();
+    setIsLoading(true);
+    setError(null);
+
+    try{
+      const result = await createCategory(formData);
+      onSubmit(result);
+      setFormData({
+        name: "",
+        description: "",
+        svgurl: "hola",
+        status: "activo",
+      });
+      onClose();
+    } catch (err){
+      setError(err.message);
+      console.error('Error completo:', err);
+      console.error('Error response:', err.response);
+      console.error('Error data:', err.response?.data);
+      setError(JSON.stringify(err.response?.data) || err.message);
+    } finally{
+      setIsLoading(false);
+    }
   };
   const handleClose = () => {
     setFormData({
       name: "",
       description: "",
-      svgurl: "",
-      status: "",
+      svgurl: "hola",
+      status: "activo",
     });
     onClose();
   };
@@ -67,6 +84,11 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -111,7 +133,7 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
             >
               Archivo SVG
             </label>
-            <input
+            {/*<input
               type="file"
               id="svgfile"
               name="svgfile"
@@ -139,7 +161,7 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                 />
               </svg>
-            </button>
+            </button>*/}
           </div>
 
           <div className="mb-6">
@@ -156,8 +178,8 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
             </select>
           </div>
 
@@ -165,15 +187,17 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
             <button
               type="button"
               onClick={handleClose}
+              disabled={isLoading}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
+              disabled={isLoading}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
             >
-              Crear Categoría
+              {isLoading ? "Creando..." : "Crear Categoría"}
             </button>
           </div>
         </form>
