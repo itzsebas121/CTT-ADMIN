@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { createCategory } from "../../api/categories";
+import { createCategory, uploadCategorySVG } from "../../api/categories";
 const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    svgurl: "hola",
+    svgurl: "",
     status: "activo",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [filesvg, setFilesvg] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -22,14 +23,14 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
     setError(null);
 
     try{
-      const result = await createCategory(formData);
+      const responsesvg = await uploadCategorySVG(filesvg);
+
+       const formDatawithSVG = ({
+        ...formData,
+        svgurl: responsesvg.svg_url,
+      })
+      const result = await createCategory(  formDatawithSVG);
       onSubmit(result);
-      setFormData({
-        name: "",
-        description: "",
-        svgurl: "hola",
-        status: "activo",
-      });
       onClose();
     } catch (err){
       setError(err.message);
@@ -45,7 +46,7 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
     setFormData({
       name: "",
       description: "",
-      svgurl: "hola",
+      svgurl: "",
       status: "activo",
     });
     onClose();
@@ -57,6 +58,7 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
         ...prev,
         svgfile: file,
       }));
+      setFilesvg(file);
     } else if (file) {
       alert("Por favor seleccione un archivo SVG válido");
     }
@@ -133,7 +135,7 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
             >
               Archivo SVG
             </label>
-            {/*<input
+            <input
               type="file"
               id="svgfile"
               name="svgfile"
@@ -161,7 +163,7 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                 />
               </svg>
-            </button>*/}
+            </button>
           </div>
 
           <div className="mb-6">

@@ -6,6 +6,7 @@ import Cursos from './pages/Cursos.jsx'
 import CourseDetail from './pages/courses/CourseDetail.jsx'
 import FormCourse from './pages/courses/FormCourse.jsx'
 import Estudiantes from './pages/Estudiantes.jsx'
+import Inscritos from './pages/inscritos.jsx'
 import ConfiguracionHome from './pages/ConfiguracionHome.jsx'
 import { isAuthenticated } from './utils/auth'
 import { ToastContainer } from 'react-toastify'
@@ -51,6 +52,7 @@ function App() {
           <Route path="cursos" element={<Cursos />} />
           <Route path="cursos/:id" element={<CourseDetail />} />
           <Route path="cursos/:id/editar" element ={<FormCourse />} />
+          <Route path="cursos/:course_id/inscritos" element={<Inscritos />} />
           <Route path="estudiantes" element={<Estudiantes />} />
           <Route path="configuracion/home" element={<ConfiguracionHome />} />
           {/* Otras rutas privadas pueden ir aquí */}

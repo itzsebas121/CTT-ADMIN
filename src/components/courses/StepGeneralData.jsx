@@ -75,7 +75,6 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
             <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría *</label>
             <select
               value={courseData.category_id}
-              {...console.log(courseData.category_id)}
               onChange={(e) => onChange('category_id', e.target.value)}
               disabled={isLoading}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent transition"

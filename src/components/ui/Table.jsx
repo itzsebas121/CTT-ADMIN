@@ -9,6 +9,7 @@ export default function Table({
   total = 0,
   totalPages = 1,
   loading = false,
+  loadingContent= false,
   onPageChange,
   onPageSizeChange,
   onFilterChange,
@@ -165,7 +166,7 @@ export default function Table({
                       colSpan={headers.length}
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
-                      No se encontraron resultados
+                      {loadingContent ? "Cargando..." : "No se encontraron resultados"}
                     </td>
                   </tr>
                 )}

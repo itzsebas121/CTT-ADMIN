@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { getCourses, getCoursesByCategory, searchCourses } from "../api/courses";
+import {
+  getCourses,
+  getCoursesByCategory,
+  searchCourses,
+} from "../api/courses";
 import { EyeIcon } from "@heroicons/react/16/solid";
 import { useNavigate } from "react-router-dom";
 import { Table } from "../components/ui";
@@ -30,31 +34,45 @@ export default function Cursos() {
     pageRequested = 1,
     pageSizeRequested = pageSize,
     status = statusFilter,
-    query = searchQuery
+    query = searchQuery,
   ) => {
     try {
       setLoading(true);
       setError(null);
 
       let response;
-      
+
       // Si hay búsqueda, usar el endpoint de búsqueda
       if (query && query.trim().length > 0) {
-        response = await searchCourses(query.trim(), pageRequested, pageSizeRequested, status);
+        response = await searchCourses(
+          query.trim(),
+          pageRequested,
+          pageSizeRequested,
+          status,
+        );
       } else {
         // Si no hay búsqueda, usar la lógica existente
-        response = category && category !== "Todos"
-          ? await getCoursesByCategory(category, pageRequested, pageSizeRequested, status)
-          : await getCourses(pageRequested, pageSizeRequested, status);
+        response =
+          category && category !== "Todos"
+            ? await getCoursesByCategory(
+                category,
+                pageRequested,
+                pageSizeRequested,
+                status,
+              )
+            : await getCourses(pageRequested, pageSizeRequested, status);
       }
-      
+
       // Manejar ambos formatos de respuesta
       const coursesArray = Array.isArray(response)
         ? response
         : response?.courses || [];
-      const respTotal = response?.total ?? (Array.isArray(response) ? response.length : 0);
+      const respTotal =
+        response?.total ?? (Array.isArray(response) ? response.length : 0);
       const respPageSize = response?.page_size ?? pageSizeRequested;
-      const respTotalPages = response?.total_pages ?? Math.max(1, Math.ceil(respTotal / respPageSize));
+      const respTotalPages =
+        response?.total_pages ??
+        Math.max(1, Math.ceil(respTotal / respPageSize));
 
       // Transformar los datos de la API para que coincidan con la estructura esperada por CardCourse
       const transformedCourses = coursesArray.map((course) => ({
@@ -76,6 +94,13 @@ export default function Cursos() {
               onClick={() => navigate(`/dashboard/cursos/${course.id}/editar`)}
             >
               Editar
+            </button>
+            <button
+              onClick={() =>
+                navigate(`/dashboard/cursos/${course.id}/inscritos`)
+              }
+            >
+              Inscritos
             </button>
           </div>
         ),
@@ -101,7 +126,13 @@ export default function Cursos() {
   // Efecto para manejar la búsqueda con debounce
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      loadCourses(categorySelected || "Todos", 1, pageSize, statusFilter, searchQuery);
+      loadCourses(
+        categorySelected || "Todos",
+        1,
+        pageSize,
+        statusFilter,
+        searchQuery,
+      );
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
@@ -116,10 +147,16 @@ export default function Cursos() {
       } else if (value === "Cerrado") {
         statusValue = "inactivo";
       }
-      
+
       setStatusFilter(statusValue);
       // Resetear a página 1 cuando cambia el filtro
-      loadCourses(categorySelected || "Todos", 1, pageSize, statusValue, searchQuery);
+      loadCourses(
+        categorySelected || "Todos",
+        1,
+        pageSize,
+        statusValue,
+        searchQuery,
+      );
     }
   };
 
@@ -150,11 +187,23 @@ export default function Cursos() {
           totalPages={totalPages}
           loading={loading}
           onPageChange={(newPage) =>
-            loadCourses(categorySelected || "Todos", newPage, pageSize, statusFilter, searchQuery)
+            loadCourses(
+              categorySelected || "Todos",
+              newPage,
+              pageSize,
+              statusFilter,
+              searchQuery,
+            )
           }
           onPageSizeChange={(newSize) => {
             setPageSize(newSize);
-            loadCourses(categorySelected || "Todos", 1, newSize, statusFilter, searchQuery);
+            loadCourses(
+              categorySelected || "Todos",
+              1,
+              newSize,
+              statusFilter,
+              searchQuery,
+            );
           }}
           onFilterChange={handleFilterChange}
           onSearchChange={handleSearchChange}
