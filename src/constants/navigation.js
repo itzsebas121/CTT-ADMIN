@@ -21,6 +21,10 @@ export const dashboardMenuItems = [
         { name: "Todos los Cursos", path: "/dashboard/cursos/" },
     ]
   },
+  {
+    name: "Categorías",
+    path: "/dashboard/categorias"
+  },
   { 
     name: "Estudiantes", 
     path: "/dashboard/estudiantes"

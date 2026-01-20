@@ -210,7 +210,7 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
     if (!courseData.course_data.description?.trim()) {
       errors.description = 'La descripción es requerida'
     }
-    if (!courseData.course_data.category_id?.trim()) {
+    if (!courseData.course_data.category_id) {
       errors.category_id = 'La categoría es requerida'
     }
     if (!courseData.course_data.place?.trim()) {

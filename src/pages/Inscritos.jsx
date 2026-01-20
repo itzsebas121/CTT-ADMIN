@@ -27,7 +27,7 @@ export default function Inscritos() {
     if (course_id){
         loadEnrrolledUsers(course_id, page, pageSize, searchQuery);
     }
-  },[]);
+  },[course_id]);
 
   const loadEnrrolledUsers = async (courseId, currentPage, currentPageSize) => {
     try {

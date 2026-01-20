@@ -168,7 +168,7 @@ export default function Table({
                       colSpan={headers.length}
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
-                      {loadingContent ? <TableLoading /> : "No se encontraron resultados"}
+                      {loadingContent ? 'cargando...' : "No se encontraron resultados"}
                     </td>
                   </tr>
                 )}
