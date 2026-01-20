@@ -5,6 +5,7 @@ import { Table } from "../components/ui";
 import { getEnrolledUsers } from "../api/enrolled_users";
 import { getCourseById } from "../api/courses";
 
+
 const headers = ["id", "Nombre", "email","Estado", "fecha de inscripcion"];
 
 export default function Inscritos() {
@@ -27,7 +28,7 @@ export default function Inscritos() {
     }
   },[course_id]);
 
-  const loadEnrrolledUsers = async (courseId, currentPage, currentPageSize, searchQuery) => {
+  const loadEnrrolledUsers = async (courseId, currentPage, currentPageSize) => {
     try {
         setLoading(true);
         setError(null);
@@ -78,6 +79,7 @@ export default function Inscritos() {
       <div className="mb-4">
         <h1 className="text-2xl font-bold mb-4">Inscritos</h1>
         <h3 className="text-2xl font-bold mb-4">{course}</h3>
+
         <Table
           headers={headers}
           data={enrolledUsers}

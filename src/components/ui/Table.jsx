@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import TableLoading from "./loadings/TableLoading";
 
 export default function Table({
   headers = [],
@@ -125,6 +126,7 @@ export default function Table({
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
           <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+            {loadingContent ? (<TableLoading />) : (
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-[#6C1313]">
                 <tr>
@@ -166,15 +168,16 @@ export default function Table({
                       colSpan={headers.length}
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
-                      {loadingContent ? "Cargando..." : "No se encontraron resultados"}
+                      {loadingContent ? <TableLoading /> : "No se encontraron resultados"}
                     </td>
                   </tr>
                 )}
               </tbody>
-            </table>
+            </table>)}
           </div>
         </div>
-      </div>
+      </div> 
+  
 
       {/* Paginación dentro de Table */}
       <div className="flex items-center justify-between mt-3 flex-col">
