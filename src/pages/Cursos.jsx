@@ -97,7 +97,9 @@ export default function Cursos() {
             </button>
             <button
               onClick={() =>
-                navigate(`/dashboard/cursos/${course.id}/inscritos`)
+                navigate(`/dashboard/cursos/${course.id}/inscritos`, {
+                  state: { courseName: course.title }
+                })
               }
             >
               Inscritos
@@ -134,7 +136,6 @@ export default function Cursos() {
         searchQuery,
       );
     }, 500);
-
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 

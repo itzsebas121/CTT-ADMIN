@@ -1,5 +1,5 @@
-import { useState, useEffect, use } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/16/solid";
 import { Table } from "../components/ui";
 import { getEnrolledUsers } from "../api/enrolled_users";
@@ -10,7 +10,8 @@ const headers = ["id", "Nombre", "email","Estado", "fecha de inscripcion"];
 
 export default function Inscritos() {
   const navigate = useNavigate();
-  const [course, setCourse] = useState("");
+  const location = useLocation();
+  const [course, setCourse] = useState(location.state?.courseName || "");
   const [enrolledUsers, setEnrolledUsers] = useState([]);
   const {course_id} = useParams();
   const [loading, setLoading] = useState(true);
@@ -26,15 +27,13 @@ export default function Inscritos() {
     if (course_id){
         loadEnrrolledUsers(course_id, page, pageSize, searchQuery);
     }
-  },[course_id]);
+  },[]);
 
   const loadEnrrolledUsers = async (courseId, currentPage, currentPageSize) => {
     try {
         setLoading(true);
         setError(null);
         const response = await getEnrolledUsers(courseId);
-        const responseCourse = await getCourseById(courseId);
-        const course = responseCourse.title || "";
         const enrollments = response.enrollments || [];
         const transformedCourses = enrollments.map((enrollment) => ({
             id: enrollment.id,
