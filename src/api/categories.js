@@ -30,3 +30,21 @@ export const uploadCategorySVG = async (file) => {
     });
     return response.data;
 };
+export const updateCategory = async (categoryId, categoryData) => {
+    const token = localStorage.getItem('token');
+    const response = await api.put(`/categories/${categoryId}`, categoryData, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+export const deleteCategory = async (categoryId) => {
+    const token = localStorage.getItem('token');
+    const response = await api.delete(`/categories/${categoryId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+}

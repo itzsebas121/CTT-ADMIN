@@ -40,7 +40,6 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
     }
     setCategories(prev=> [...prev, newCategory])
     onChange('category_id', categoryData.id)
-    console.log('Nueva categoría creada:', categoryData)
   }
 
   return (
