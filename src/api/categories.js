@@ -9,14 +9,39 @@ export const createCategory = async (categoryData)=>{
     });
     return response.data;
 }
-export const getAllCategories = async () => {
-    const token = localStorage.getItem('token');
-    const response = await api.get('/categories', {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
-    });
-    return response.data;
+export const getAllCategories = async (page=1,pageSize=10,status_filter=null) => {
+    try {
+        const token = localStorage.getItem('token');
+        const params = {
+            page,
+            page_size: pageSize,
+            include_inactive: true
+        };
+        
+        // Solo agregar status si se proporciona
+        if (status_filter) {
+            params.status_filter = status_filter;
+        }
+        
+        const response = await api.get('/categories', { params,
+                headers: { 
+                    Authorization : `Bearer ${token}`
+                }
+            },
+        );
+        const data = response.data;
+        console.log('Respuesta completa de la API:', data);
+        return data;
+    } catch (error) {
+        if (error.code === 'ECONNABORTED') {
+            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
+        }
+        if (error.response) {
+            console.error('Error response:', error.response.data);
+            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
+        }
+        throw new Error(`Error de red: ${error.message}`);
+    }
 }
 export const uploadCategorySVG = async (file) => {
     const token = localStorage.getItem('token');
@@ -42,6 +67,15 @@ export const updateCategory = async (categoryId, categoryData) => {
 export const deleteCategory = async (categoryId) => {
     const token = localStorage.getItem('token');
     const response = await api.delete(`/categories/${categoryId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+}
+export const searchCategories = async(categoryName)=>{
+    const token = localStorage.getItem('token');
+    const response = await api.get(`/categories/by-name/${categoryName}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
