@@ -49,7 +49,7 @@ export default function CourseSidebar({ course }) {
                 <div className="space-y-2">
                     {course.organizers?.map((organizer, index) => (
                         <div key={index} className="flex items-center space-x-3">
-                            <div className="w-2 h-2 bg-[#6C1313] rounded-full"></div>
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
                             <span className="text-sm text-gray-600">{organizer}</span>
                         </div>
                     ))}
@@ -65,7 +65,7 @@ export default function CourseSidebar({ course }) {
                 <div className="space-y-2">
                     {course.target_audience?.map((audience, index) => (
                         <div key={index} className="flex items-center space-x-3">
-                            <UserGroupIcon className="h-4 w-4 text-[#6C1313]" />
+                            <UserGroupIcon className="h-4 w-4 text-primary" />
                             <span className="text-sm text-gray-600">{audience}</span>
                         </div>
                     ))}

@@ -55,11 +55,11 @@ export default function Cursos() {
         response =
           category && category !== "Todos"
             ? await getCoursesByCategory(
-                category,
-                pageRequested,
-                pageSizeRequested,
-                status,
-              )
+              category,
+              pageRequested,
+              pageSizeRequested,
+              status,
+            )
             : await getCourses(pageRequested, pageSizeRequested, status);
       }
 
@@ -171,7 +171,7 @@ export default function Cursos() {
         <h1 className="text-xl font-semibold">Cursos</h1>
         <button
           onClick={() => navigate("/dashboard/cursos/crear/editar")}
-          className="px-4 py-2 bg-[#6C1313] hover:bg-[#5a0f0f] text-white rounded-lg transition"
+          className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition"
         >
           + Crear curso
         </button>

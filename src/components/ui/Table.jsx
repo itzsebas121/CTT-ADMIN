@@ -96,7 +96,7 @@ export default function Table({
           placeholder="Buscar..."
           value={search}
           onChange={handleSearchChange}
-          className="px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6C1313] focus:border-[#6C1313]"
+          className="px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
         />
 
         {/* Filtros por columna */}
@@ -108,7 +108,7 @@ export default function Table({
                   key={header}
                   value={columnFilters[header] || "All"}
                   onChange={(e) => handleFilterChange(header, e.target.value)}
-                  className="px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6C1313] focus:border-[#6C1313] text-sm"
+                  className="px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm"
                 >
                   <option value="All">Todos {header}</option>
                   {filters[header].map((option) => (
@@ -130,7 +130,7 @@ export default function Table({
               <TableLoading rows={pageSize} cols={headers.length} />
             ) : (
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-[#6C1313] sticky top-0 z-10">
+                <thead className="bg-primary sticky top-0 z-10">
                   <tr>
                     {headers.map((header, idx) => (
                       <th
@@ -148,7 +148,7 @@ export default function Table({
                     filteredData.map((row, rowIndex) => (
                       <tr
                         key={rowIndex}
-                        className="hover:bg-[#6C1313]/5 transition-colors duration-150"
+                        className="hover:bg-primary/5 transition-colors duration-150"
                       >
                         {headers.map((header, colIndex) => (
                           <td

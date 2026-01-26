@@ -4,7 +4,7 @@ import AOS from "aos"
 import 'aos/dist/aos.css'
 import { getCourses, getCoursesByCategory, getCoursesByHoursRange } from "../../api/courses"
 
-export default function CoursesList({filters}) {
+export default function CoursesList({ filters }) {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -55,7 +55,7 @@ export default function CoursesList({filters}) {
 
     // Convertir el filtro de duración a rango de horas
     const getHoursRange = (durationFilter) => {
-        switch(durationFilter) {
+        switch (durationFilter) {
             case 'less10':
                 return [0, 9];
             case '10to19':
@@ -84,7 +84,7 @@ export default function CoursesList({filters}) {
 
         const hours = parseInt(courseHours, 10);
 
-        switch(filters.duration) {
+        switch (filters.duration) {
             case 'less10':
                 return hours >= 0 && hours <= 9;
             case '10to19':
@@ -138,12 +138,12 @@ export default function CoursesList({filters}) {
 
     return (
         <div className="overflow-hidden bg-white mx-auto max-w-7xl md:px-6 lg:px-8 pt-8" data-aos="fade-down">
-            <h2 className="text-2xl font-semibold text-[#6C1313] ml-6">Cursos</h2>
+            <h2 className="text-2xl font-semibold text-primary ml-6">Cursos</h2>
 
             {loading && (
                 <div className="flex justify-center items-center mt-10">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6C1313]"></div>
-                    <span className="ml-3 text-[#6C1313]">Cargando cursos...</span>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    <span className="ml-3 text-primary">Cargando cursos...</span>
                 </div>
             )}
 

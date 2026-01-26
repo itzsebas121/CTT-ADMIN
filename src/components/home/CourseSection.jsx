@@ -18,7 +18,7 @@ const categories = [
 
 export default function CourseSection({ filters }) {
     const navigate = useNavigate();
-    
+
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -72,22 +72,22 @@ export default function CourseSection({ filters }) {
     return (
         <div className="overflow-hidden bg-white py-24 sm:py-32" data-aos="fade-down">
             <div className="mx-auto max-w-7xl md:px-6 lg:px-8">
-                <h2 className="text-2xl font-semibold text-[#6C1313] ml-6">Cursos y Categorías</h2>
+                <h2 className="text-2xl font-semibold text-primary ml-6">Cursos y Categorías</h2>
                 <div className="flex justify-center">
                     <div className="mt-6 flex flex-around gap-x-10 px-6 gap-y-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
                         {categories.map((category) => (
                             <button
                                 key={category.id}
                                 style={{
-                                    backgroundColor: activeCategory === category.text ? '#6C1313' : '#F5F5F5',
-                                    color: activeCategory === category.text ? 'white' : '#6C1313'
+                                    backgroundColor: activeCategory === category.text ? 'var(--color-primary)' : '#F5F5F5',
+                                    color: activeCategory === category.text ? 'white' : 'var(--color-primary)'
                                 }}
                                 className="flex flex-col items-center justify-center text-center min-w-[150px] transition-all duration-200 hover:opacity-80"
                                 onClick={() => handleCategoryChange(category.text)}
                                 data-aos="zoom-in">
                                 <category.icon
-                                    className={`h-20 w-20 mb-1 ${activeCategory === category.text ? 'text-white' : 'text-[#6C1313]'}`} 
-                                    strokeWidth={0.5} 
+                                    className={`h-20 w-20 mb-1 ${activeCategory === category.text ? 'text-white' : 'text-primary'}`}
+                                    strokeWidth={0.5}
                                 />
                                 <span>{category.text}</span>
                                 <button className="mt-2">
@@ -99,8 +99,8 @@ export default function CourseSection({ filters }) {
                 </div>
                 {loading && (
                     <div className="flex justify-center items-center mt-10">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6C1313]"></div>
-                        <span className="ml-3 text-[#6C1313]">Cargando cursos...</span>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                        <span className="ml-3 text-primary">Cargando cursos...</span>
                     </div>
                 )}
 
@@ -121,17 +121,17 @@ export default function CourseSection({ filters }) {
                 {!loading && !error && courses.length > 0 && (
                     <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
                         <div className=" mt-10 lg:m-10 flex lg:grid sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch h-auto">
-                        {courses.map((course, index) => (
-                            <div data-aos="zoom-in" key={course.id || index} className="inline-block w-full px-6">
-                                <CardCourse
-                                    title={course.title}
-                                    image={course.image}
-                                    isOpen={course.isOpen}
-                                    hours={course.hours}
-                                    id={course.id}
-                                />
-                            </div>
-                        ))}
+                            {courses.map((course, index) => (
+                                <div data-aos="zoom-in" key={course.id || index} className="inline-block w-full px-6">
+                                    <CardCourse
+                                        title={course.title}
+                                        image={course.image}
+                                        isOpen={course.isOpen}
+                                        hours={course.hours}
+                                        id={course.id}
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}
@@ -161,7 +161,7 @@ export default function CourseSection({ filters }) {
                 )}
                 <div className="m-10 mt-6 flex flex-wrap gap-x-4 gap-y-2" data-aos="fade-right">
                     <button
-                        className="transition-all duration-200 hover:bg-[#5a0f0f] focus:outline-none focus:bg-[#5a0f0f] focus:ring-2 focus:ring-[#6C1313] focus:ring-opacity-50 active:bg-[#4a0c0c]"
+                        className="transition-all duration-200 hover:bg-primary-hover focus:outline-none focus:bg-primary-hover focus:ring-2 focus:ring-primary focus:ring-opacity-50 active:bg-primary-active"
                         onClick={handleViewMoreCourses}
                     >
                         Ver más cursos...

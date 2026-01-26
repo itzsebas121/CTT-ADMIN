@@ -85,7 +85,7 @@ export default function Menu() {
       {/* Botón hamburguesa - solo visible en pantallas pequeñas y medianas */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#6C1313] text-white rounded"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {isOpen ? (
@@ -106,7 +106,7 @@ export default function Menu() {
 
       {/* Menú lateral */}
       <aside className={`
-        w-64 bg-gradient-to-b from-[#6C1313] to-[#3a0a0a] text-white flex flex-col
+        w-64 bg-gradient-to-b from-primary to-primary-active text-white flex flex-col
         fixed lg:static inset-y-0 left-0 z-40 shadow-xl
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -187,7 +187,7 @@ export default function Menu() {
         {user && (
           <div className="p-4 border-t border-white/30">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#6C1313] font-bold text-xl">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary font-bold text-xl">
                 {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="flex-1 min-w-0">

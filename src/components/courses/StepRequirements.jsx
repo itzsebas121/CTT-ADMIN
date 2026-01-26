@@ -1,8 +1,8 @@
-export default function StepRequirements({ 
-  requirementsData, 
-  onChange, 
-  onArrayChange, 
-  onAddArrayItem, 
+export default function StepRequirements({
+  requirementsData,
+  onChange,
+  onArrayChange,
+  onAddArrayItem,
   onRemoveArrayItem,
   onPriceChange,
   onAddPrice,
@@ -22,7 +22,7 @@ export default function StepRequirements({
               type="date"
               value={requirementsData.start_date_registration}
               onChange={(e) => onChange('start_date_registration', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div>
@@ -31,7 +31,7 @@ export default function StepRequirements({
               type="date"
               value={requirementsData.end_date_registration}
               onChange={(e) => onChange('end_date_registration', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div>
@@ -40,7 +40,7 @@ export default function StepRequirements({
               type="date"
               value={requirementsData.start_date_course}
               onChange={(e) => onChange('start_date_course', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div>
@@ -49,7 +49,7 @@ export default function StepRequirements({
               type="date"
               value={requirementsData.end_date_course}
               onChange={(e) => onChange('end_date_course', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function StepRequirements({
               type="time"
               value={requirementsData.start_time}
               onChange={(e) => onChange('start_time', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div>
@@ -74,7 +74,7 @@ export default function StepRequirements({
               type="time"
               value={requirementsData.end_time}
               onChange={(e) => onChange('end_time', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function StepRequirements({
           type="text"
           value={requirementsData.location}
           onChange={(e) => onChange('location', e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
           placeholder="Ej: Sala 301, Edificio A"
         />
       </div>
@@ -102,7 +102,7 @@ export default function StepRequirements({
               type="number"
               value={requirementsData.min_quota}
               onChange={(e) => onChange('min_quota', parseInt(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div>
@@ -111,7 +111,7 @@ export default function StepRequirements({
               type="number"
               value={requirementsData.max_quota}
               onChange={(e) => onChange('max_quota', parseInt(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function StepRequirements({
               type="number"
               value={requirementsData.in_person_hours}
               onChange={(e) => onChange('in_person_hours', parseInt(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div>
@@ -132,7 +132,7 @@ export default function StepRequirements({
               type="number"
               value={requirementsData.autonomous_hours}
               onChange={(e) => onChange('autonomous_hours', parseInt(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
         </div>
@@ -141,11 +141,11 @@ export default function StepRequirements({
       {/* Modalidad y Certificación */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Modalidad *</label>
-            <select
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Modalidad *</label>
+          <select
             value={requirementsData.modality}
             onChange={(e) => onChange('modality', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             <option value="Presencial">Presencial</option>
             <option value="Virtual">Virtual</option>
@@ -158,7 +158,7 @@ export default function StepRequirements({
             type="text"
             value={requirementsData.certification}
             onChange={(e) => onChange('certification', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder="Ej: Certificado de participación"
           />
         </div>
@@ -180,7 +180,7 @@ export default function StepRequirements({
                     onChange('days', requirementsData.days.filter(d => d !== day));
                   }
                 }}
-                className="w-4 h-4 text-[#6C1313] border-gray-300 rounded focus:ring-2 focus:ring-[#6C1313]"
+                className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary"
               />
               <span className="text-sm text-gray-700">{day}</span>
             </label>
@@ -197,7 +197,7 @@ export default function StepRequirements({
               type="text"
               value={pre}
               onChange={(e) => onArrayChange('prerequisites', i, e.target.value)}
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent"
               placeholder={`Prerrequisito ${i + 1}`}
             />
             <button
@@ -210,7 +210,7 @@ export default function StepRequirements({
         ))}
         <button
           onClick={() => onAddArrayItem('prerequisites')}
-          className="px-5 py-2.5 bg-[#6C1313] hover:bg-[#5a0f0f] text-white rounded-lg transition font-medium shadow-sm"
+          className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg transition font-medium shadow-sm"
         >
           + Agregar Prerrequisito
         </button>
@@ -226,14 +226,14 @@ export default function StepRequirements({
               placeholder="Monto"
               value={price.amount}
               onChange={(e) => onPriceChange(i, 'amount', parseFloat(e.target.value))}
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             <input
               type="text"
               placeholder="Categoría (Ej: Estudiante, Profesional)"
               value={price.category}
               onChange={(e) => onPriceChange(i, 'category', e.target.value)}
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             <button
               onClick={() => onRemovePrice(i)}
@@ -245,7 +245,7 @@ export default function StepRequirements({
         ))}
         <button
           onClick={onAddPrice}
-          className="px-5 py-2.5 bg-[#6C1313] hover:bg-[#5a0f0f] text-white rounded-lg transition font-medium shadow-sm"
+          className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg transition font-medium shadow-sm"
         >
           + Agregar Precio
         </button>

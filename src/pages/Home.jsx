@@ -1,10 +1,10 @@
 import { Stats, CourseSection, Carousel, BannerImage } from '../components/home';
 
-const contentHero =[
+const contentHero = [
   {
     id: 1,
     image:
-      "https://ctt-talleresfisei.uta.edu.ec/img/carrusel/carrusel_2.jpeg", 
+      "https://ctt-talleresfisei.uta.edu.ec/img/carrusel/carrusel_2.jpeg",
     title: "CURSOS VIRTUALES Y PRESENCIALES",
     subtitle: "Compromiso con el desarrollo tecnológico.",
     buttonText: "Conoce los cursos",
@@ -13,7 +13,7 @@ const contentHero =[
   {
     id: 2,
     image:
-      "https://www.lahora.com.ec/__export/1744656999548/sites/lahora/img/2025/04/14/20250414_125632861_Universidad_Txcnica_de_Ambato_define_fechas_de_inicio_de_matrxculas.jpg", 
+      "https://www.lahora.com.ec/__export/1744656999548/sites/lahora/img/2025/04/14/20250414_125632861_Universidad_Txcnica_de_Ambato_define_fechas_de_inicio_de_matrxculas.jpg",
     title: "CURSOS VIRTUALES Y PRESENCIALES",
     subtitle: "Compromiso con el desarrollo tecnológico.",
     buttonText: "Conoce los cursos",
@@ -58,7 +58,7 @@ const slidesCarrussel = [
   {
     id: 1,
     image:
-      "https://picsum.photos/id/1018/1600/600", 
+      "https://picsum.photos/id/1018/1600/600",
     title: "¡LA UTA SIGUE CRECIENDO CONTIGO!",
     subtitle: "Proyectos UTA financiados por el BDE",
     buttonText: "Conoce los proyectos",
@@ -91,10 +91,10 @@ export default function Home() {
   return (
     <div>
       <Carousel slides={contentHero} height='calc(100vh - 198px)' buttons colorText={'#FFFFFF'} />
-      <CourseSection/>
+      <CourseSection />
       <BannerImage slides={slides} />
-      <Stats/>
-      <Carousel slides={slidesCarrussel} marginBottom={65} colorText={'#6C1313'} background={'white'}/>
+      <Stats />
+      <Carousel slides={slidesCarrussel} marginBottom={65} colorText={'var(--color-primary)'} background={'white'} />
     </div>
   );
 }

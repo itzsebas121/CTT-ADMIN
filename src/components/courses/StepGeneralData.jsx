@@ -12,17 +12,17 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
       try {
         setIsLoading(true);
         const response = await getAllCategories();
-        const CategoriesArray=response.items || response;
+        const CategoriesArray = response.items || response;
 
-        const categoriesData = CategoriesArray.map(cat=>({
+        const categoriesData = CategoriesArray.map(cat => ({
           id: cat.id,
           name: cat.name,
         }))
         setCategories(categoriesData);
-      }catch (error) {
+      } catch (error) {
         console.error('Error al obtener categorías:', error);
         setCategories(['TICS', 'Educativo', 'Software', 'Electrónica', 'Congresos']);
-      }finally {
+      } finally {
         setIsLoading(false);
       }
 
@@ -38,14 +38,14 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
       id: categoryData.id,
       name: categoryData.name,
     }
-    setCategories(prev=> [...prev, newCategory])
+    setCategories(prev => [...prev, newCategory])
     onChange('category_id', categoryData.id)
   }
 
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Información General</h2>
-      
+
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">Título del Curso *</label>
@@ -53,7 +53,7 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
             type="text"
             value={courseData.title}
             onChange={(e) => onChange('title', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent transition"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition"
             placeholder="Ej: Introducción a React"
           />
         </div>
@@ -63,7 +63,7 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
           <textarea
             value={courseData.description}
             onChange={(e) => onChange('description', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent transition"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition"
             rows="4"
             placeholder="Describe el curso de manera clara y concisa"
           />
@@ -76,7 +76,7 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
               value={courseData.category_id}
               onChange={(e) => onChange('category_id', e.target.value)}
               disabled={isLoading}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent transition"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition"
             >
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -84,7 +84,7 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
             </select>
           </div>
           <div className="flex justify-center">
-            <button className="mt-7 text-sm text-[#6C1313] hover:text-[#5a0f0f]" onClick={handleAddCategory}>
+            <button className="mt-7 text-sm text-primary hover:text-primary-hover" onClick={handleAddCategory}>
               + Agregar Categoría
             </button>
           </div>
@@ -94,7 +94,7 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
             <select
               value={courseData.status}
               onChange={(e) => onChange('status', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent transition"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition"
             >
               {statuses.map(status => (
                 <option key={status} value={status}>{status}</option>
@@ -108,7 +108,7 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
               type="text"
               value={courseData.place}
               onChange={(e) => onChange('place', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent transition"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition"
               placeholder="Ej: Auditorio Principal"
             />
           </div>
@@ -154,7 +154,7 @@ export default function StepGeneralData({ courseData, onChange, onArrayChange, o
           placeholder={(i) => `Público ${i + 1}`}
         />
       </div>
-            {/* Modal para crear categoría */}
+      {/* Modal para crear categoría */}
       <CategoryCreation
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -174,20 +174,20 @@ function ArrayField({ label, items, onItemChange, onAddItem, onRemoveItem, place
             type="text"
             value={item}
             onChange={(e) => onItemChange(i, e.target.value)}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#6C1313] focus:border-transparent"
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder={typeof placeholder === 'function' ? placeholder(i) : placeholder}
           />
           <button
             onClick={() => onRemoveItem(i)}
             className="rojo self-end md:self-auto"
-          > 
+          >
             Eliminar
           </button>
         </div>
       ))}
       <button
         onClick={onAddItem}
-        className="px-5 py-2.5 bg-[#6C1313] hover:bg-[#5a0f0f] text-white rounded-lg transition font-medium shadow-sm"
+        className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg transition font-medium shadow-sm"
       >
         + Agregar
       </button>

@@ -20,14 +20,14 @@ export default function Nav() {
 
   return (
     <>
-      <nav aria-label="Global" className="sticky top-0 shadow-lg md:top-40 lg:top-30 z-50 w-full flex items-center justify-between p-6 lg:px-8 bg-[#FFFFFF] md:bg-[#6C1313] lg:bg-[#6C1313]">
+      <nav aria-label="Global" className="sticky top-0 shadow-lg md:top-40 lg:top-30 z-50 w-full flex items-center justify-between p-6 lg:px-8 bg-white md:bg-primary lg:bg-primary">
         <div className="lg:flex md:flex hidden lg:gap-x-12 md:gap-x-12 gap-4 lg:pl-30 md:pl-20">
           {navigation2.map((item) => (
             <NavLink
               key={item.id}
               to={item.href}
               className={({ isActive }) =>
-                `font-semibold transition ${isActive ? "text-[#6C1313] md:text-white border-b-2 border-[#6C1313] md:border-white" : "text-gray-700 md:text-gray-200 hover:text-[#6C1313] md:hover:text-white"
+                `font-semibold transition ${isActive ? "text-primary md:text-white border-b-2 border-primary md:border-white" : "text-gray-700 md:text-gray-200 hover:text-primary md:hover:text-white"
                 }`
               }
             >
@@ -88,8 +88,8 @@ export default function Nav() {
                     onClick={() => setMobileMenuOpen(false)}
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2 font-semibold  ${isActive
-                        ? "bg-[#6C1313]"
-                        : "text-[#6C1313] NavLink  hover:bg-[#6C1313] "
+                        ? "bg-primary"
+                        : "text-primary NavLink  hover:bg-primary "
                       }`
                     }
                   >
@@ -98,14 +98,14 @@ export default function Nav() {
                 ))}
               </div>
             </div>
-            <div className="border-t-1 border-[#6C1313] divide-y divide-gray-500/10" >
+            <div className="border-t-1 border-primary divide-y divide-gray-500/10" >
               <div className="space-y-2 py-6">
                 {itemsHeader.map((item) => (
                   <a
                     key={item.id}
                     href={item.href}
                     className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold"
-                    style={{ color: '#6C1313' }}
+                    style={{ color: 'var(--color-primary)' }}
                   >
                     {item.title}
                   </a>

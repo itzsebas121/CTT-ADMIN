@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import { isAuthenticated, saveAuthData } from '../utils/auth'
 
 
-export default function Login () {
+export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -72,14 +72,14 @@ export default function Login () {
               src="src/assets/logoCTT.webp"
               className="mx-auto h-30 w-auto"
             />
-            <h2 className="text-center text-2xl font-bold mt-1 tracking-tight text-[#6C1313]">
+            <h2 className="text-center text-2xl font-bold mt-1 tracking-tight text-primary">
               Panel Administrativo CTT
             </h2>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#6C1313]">
+              <label htmlFor="email" className="block text-sm font-medium text-primary">
                 Correo electrónico
               </label>
               <div className="mt-2">
@@ -96,7 +96,7 @@ export default function Login () {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#6C1313]">
+              <label htmlFor="password" className="block text-sm font-medium text-primary">
                 Contraseña
               </label>
               <div className="mt-2">
@@ -112,21 +112,21 @@ export default function Login () {
               </div>
             </div>
             {loading && (
-                    <div className="flex justify-center items-center mt-10">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6C1313]"></div>
-                    </div>
-                )}
+              <div className="flex justify-center items-center mt-10">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              </div>
+            )}
             {errorMessage && (
 
-              <p className="text-red-600 text-sm text-center">{errorMessage }</p>
+              <p className="text-red-600 text-sm text-center">{errorMessage}</p>
             )}
-            
+
 
             <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full justify-center rounded-md bg-[#6C1313] px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-[#8a1a1a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 {loading ? 'Iniciando...' : 'Iniciar sesión'}
               </button>

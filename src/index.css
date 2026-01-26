@@ -2,12 +2,22 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
+@theme {
+  --color-primary: #6C1313;
+  --color-primary-hover: #5a0f0f;
+  --color-primary-active: #4a0c0c;
+  --color-secondary: #CB972D;
+  --color-secondary-hover: #916500;
+  --color-text-gray: #919191;
+  --color-text-main: #213547;
+}
+
 :root {
   font-family: sans-serif, "Roboto", system-ui, Avenir, Helvetica, Arial;
   line-height: 1.5;
   font-weight: 400;
 
-  color: #213547;
+  color: var(--color-text-main);
   background-color: #ffffff;
 
   font-synthesis: none;
@@ -22,7 +32,7 @@ a {
 }
 
 .agray {
-  color: #919191
+  color: var(--color-text-gray);
 }
 
 h1 {
@@ -40,16 +50,16 @@ button {
   cursor: pointer;
   transition: 0.5s;
   color: white;
-  background-color: #CB972D;
+  background-color: var(--color-secondary);
 }
 
 button:hover {
-  background-color: #916500;
+  background-color: var(--color-secondary-hover);
 }
 
 button:focus,
 button:focus-visible {
-  background-color: #916500;
+  background-color: var(--color-secondary-hover);
 }
 
 button.rojo {
@@ -62,22 +72,22 @@ button.rojo {
   cursor: pointer;
   transition: 0.5s;
   color: white;
-  background: #6C1313;
+  background: var(--color-primary);
 }
 
 button.rojo:hover {
-  background-color: #5a0f0f;
+  background-color: var(--color-primary-hover);
 }
 
 button.rojo:focus,
 button.rojo:focus-visible {
-  background-color: #5a0f0f;
+  background-color: var(--color-primary-hover);
   outline: none;
   box-shadow: 0 0 0 2px rgba(108, 19, 19, 0.5);
 }
 
 button.rojo:active {
-  background-color: #4a0c0c;
+  background-color: var(--color-primary-active);
 }
 
 .scrollbar-hide {
@@ -93,7 +103,7 @@ button.rojo:active {
 }
 
 .NavLink {
-  color: #6C1313;
+  color: var(--color-primary);
 }
 
 @keyframes fadeIn {

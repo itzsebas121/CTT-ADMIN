@@ -64,8 +64,8 @@ export default function FormCourse() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6C1313] mx-auto mb-4"></div>
-          <p className="text-[#6C1313] text-lg">Cargando curso...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-primary text-lg">Cargando curso...</p>
         </div>
       </div>
     );
@@ -99,7 +99,7 @@ export default function FormCourse() {
           <p className="text-gray-500 text-lg">Curso no encontrado</p>
           <button
             onClick={() => navigate("/dashboard/cursos")}
-            className="mt-4 bg-[#6C1313] hover:bg-[#5a0f0f] text-white font-bold py-2 px-6 rounded transition-colors"
+            className="mt-4 bg-primary hover:bg-primary-hover text-white font-bold py-2 px-6 rounded transition-colors"
           >
             Volver
           </button>
@@ -115,7 +115,7 @@ export default function FormCourse() {
           <div className="flex justify-end">
             <button
               onClick={() => navigate("/dashboard/cursos")}
-              className="flex items-center text-[#6C1313] hover:text-[#5a0f0f] transition-colors font-medium mb-5"
+              className="flex items-center text-primary hover:text-primary-hover transition-colors font-medium mb-5"
             >
               <ArrowLeftIcon className="h-5 w-5 mr-2" />
               Volver
@@ -137,7 +137,7 @@ export default function FormCourse() {
           currentStep={step}
           onStepChange={setStep}
           steps={steps}
-          accentColor="#6C1313"
+          accentColor="var(--color-primary)"
           clickable={true}
         />
 
@@ -232,7 +232,7 @@ export default function FormCourse() {
             <button
               onClick={handleNextStep}
               disabled={imageUploading}
-              className="px-6 py-3 bg-[#6C1313] hover:bg-[#5a0f0f] text-white rounded-lg transition font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-lg transition font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Siguiente →
             </button>
@@ -245,10 +245,10 @@ export default function FormCourse() {
               {saving
                 ? "⏳ Guardando..."
                 : imageUploading
-                ? "Espere, subiendo imagen..."
-                : isEdit
-                ? "✓ Guardar Cambios"
-                : "✓ Guardar Curso"}
+                  ? "Espere, subiendo imagen..."
+                  : isEdit
+                    ? "✓ Guardar Cambios"
+                    : "✓ Guardar Curso"}
             </button>
           )}
         </div>

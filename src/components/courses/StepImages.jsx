@@ -22,7 +22,7 @@ export default function StepImages({ banner, detail, onChangeImage }) {
               type="file"
               accept="image/*"
               onChange={(e) => onChangeImage('course_image', e.target.files?.[0])}
-              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#6C1313] file:text-white hover:file:bg-[#5a0f0f]"
+              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover"
             />
             <p className="mt-2 text-xs text-gray-500">Se mostrará como banner del curso.</p>
           </div>
@@ -45,7 +45,7 @@ export default function StepImages({ banner, detail, onChangeImage }) {
               type="file"
               accept="image/*"
               onChange={(e) => onChangeImage('course_image_detail', e.target.files?.[0])}
-              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#6C1313] file:text-white hover:file:bg-[#5a0f0f]"
+              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover"
             />
             <p className="mt-2 text-xs text-gray-500">Se mostrará en la vista detallada del curso.</p>
           </div>

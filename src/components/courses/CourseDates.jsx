@@ -2,7 +2,7 @@ import { CalendarIcon } from "@heroicons/react/24/outline";
 
 export default function CourseDates({ course }) {
     const courseSchedule = course.requirements?.courseSchedule;
-    
+
     if (!courseSchedule?.startDate && !courseSchedule?.endDate) return null;
 
     const formatDate = (dateString) => {
@@ -17,7 +17,7 @@ export default function CourseDates({ course }) {
 
     return (
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h2 className="text-2xl font-bold text-[#6C1313] mb-4">
+            <h2 className="text-2xl font-bold text-primary mb-4">
                 Fechas del Curso
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

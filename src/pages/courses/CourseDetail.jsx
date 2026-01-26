@@ -41,8 +41,8 @@ export default function CourseDetail() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6C1313] mx-auto mb-4"></div>
-          <p className="text-[#6C1313] text-lg">Cargando curso...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-primary text-lg">Cargando curso...</p>
         </div>
       </div>
     );
@@ -76,7 +76,7 @@ export default function CourseDetail() {
           <p className="text-gray-500 text-lg">Curso no encontrado</p>
           <button
             onClick={() => navigate("/dashboard/cursos")}
-            className="mt-4 bg-[#6C1313] hover:bg-[#5a0f0f] text-white font-bold py-2 px-6 rounded transition-colors"
+            className="mt-4 bg-primary hover:bg-primary-hover text-white font-bold py-2 px-6 rounded transition-colors"
           >
             Volver
           </button>
@@ -92,7 +92,7 @@ export default function CourseDetail() {
         <div className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 justify-end">
           <button
             onClick={() => navigate("/dashboard/cursos")}
-            className="flex items-center text-[#6C1313] hover:text-[#5a0f0f] transition-colors font-medium"
+            className="flex items-center text-primary hover:text-primary-hover transition-colors font-medium"
           >
             <ArrowLeftIcon className="h-5 w-5 mr-2" />
             Volver
