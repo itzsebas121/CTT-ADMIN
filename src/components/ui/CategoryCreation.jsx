@@ -22,23 +22,23 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
     setIsLoading(true);
     setError(null);
 
-    try{
+    try {
       const responsesvg = await uploadCategorySVG(filesvg);
 
-       const formDatawithSVG = ({
+      const formDatawithSVG = ({
         ...formData,
         svgurl: responsesvg.svg_url,
       })
-      const result = await createCategory(  formDatawithSVG);
+      const result = await createCategory(formDatawithSVG);
       onSubmit(result);
       onClose();
-    } catch (err){
+    } catch (err) {
       setError(err.message);
       console.error('Error completo:', err);
       console.error('Error response:', err.response);
       console.error('Error data:', err.response?.data);
       setError(JSON.stringify(err.response?.data) || err.message);
-    } finally{
+    } finally {
       setIsLoading(false);
     }
   };
@@ -51,7 +51,7 @@ const CategoryCreation = ({ isOpen, onClose, onSubmit }) => {
     });
     onClose();
   };
-    const handleFileChange = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type === "image/svg+xml") {
       setFormData((prev) => ({

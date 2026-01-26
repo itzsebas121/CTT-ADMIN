@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getUsers } from "../api/users";
 import { Table } from "../components/ui";
+import { TablePageLayout } from "../components/layout";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -86,33 +87,30 @@ export default function Estudiantes() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Gestión de Estudiantes</h1>
-        <p className="text-sm text-gray-500 mt-1">Administra la información de los estudiantes y usuarios</p>
-      </div>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
-        <Table
-          headers={headers}
-          data={users}
-          filters={filters}
-          page={page}
-          pageSize={pageSize}
-          total={total}
-          totalPages={totalPages}
-          loading={loading}
-          onPageChange={(newPage) =>
-            loadUsers(newPage, pageSize, typeFilter)
-          }
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize);
-            loadUsers(1, newSize, typeFilter);
-          }}
-          onFilterChange={handleFilterChange}
-          onReload={handleReload}
-        />
-      </div>
+    <TablePageLayout
+      title="Gestión de Estudiantes"
+      description="Administra la información de los estudiantes y usuarios"
+    >
+      <Table
+        headers={headers}
+        data={users}
+        filters={filters}
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        totalPages={totalPages}
+        loading={loading}
+        onPageChange={(newPage) =>
+          loadUsers(newPage, pageSize, typeFilter)
+        }
+        onPageSizeChange={(newSize) => {
+          setPageSize(newSize);
+          loadUsers(1, newSize, typeFilter);
+        }}
+        onFilterChange={handleFilterChange}
+        onReload={handleReload}
+      />
       {error && <div className="text-red-500 text-sm mt-2 px-1">{error}</div>}
-    </div>
+    </TablePageLayout>
   );
 }

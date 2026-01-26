@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeftIcon } from "@heroicons/react/16/solid";
-import Table from "../../components/ui/Table";
-import { getAllCategories } from "../../api/categories";
-import { EyeIcon } from "@heroicons/react/16/solid";
-import CategoryEdition from "../../components/ui/CategoryEdition";
-import { updateCategory, deleteCategory } from "../../api/categories";
-import { ConfirmDialog } from "../../components/ui";
+import Table from "../components/ui/Table";
+import { TablePageLayout } from "../components/layout";
+import { getAllCategories } from "../api/categories";
+import CategoryEdition from "../components/ui/CategoryEdition";
+import CategoryCreation from "../components/ui/CategoryCreation";
+import { deleteCategory } from "../api/categories";
+import { ConfirmDialog } from "../components/ui";
 
 const filters = {
   Estado: ["Activo", "Inactivo"],
@@ -14,7 +14,6 @@ const filters = {
 const headers = ["id", "Nombre", "Estado", "Creado por", "acciones"];
 
 export default function Categories() {
-  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,32 +55,7 @@ export default function Categories() {
       loadCategories(1, pageSize, statusvalue);
     }
   };
-  const handleEditCategory = async (categoryData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await updateCategory(selectedCategory.id, categoryData);
-      setIsModalOpen(false);
-      setSelectedCategory(null);
-      await loadCategories();
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      loadCategories(1, pageSize, statusFilter, searchQuery);
-    }, 500);
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
-  const handleSearchChange = (value) => {
-    setSearchQuery(value);
-  };
 
-  const handleShowEditModal = (category) => {
-    setSelectedCategory(category);
-    setIsModalOpen(true);
-  };
   const loadCategories = async (
     pageRequested = 1,
     pageSizeRequested = pageSize,
@@ -150,10 +124,62 @@ export default function Categories() {
       setLoading(false);
     }
   };
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const handleCreateSuccess = async () => {
+    try {
+      setIsCreateModalOpen(false);
+      await loadCategories();
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleSaveCategory = async () => {
+    try {
+      setIsModalOpen(false);
+      setSelectedCategory(null);
+      await loadCategories();
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      loadCategories(1, pageSize, statusFilter, searchQuery);
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
+  };
+
+  const handleShowEditModal = (category) => {
+    setSelectedCategory(category);
+    setIsModalOpen(true);
+  };
+
+  const handleReload = () => {
+    loadCategories(page, pageSize, statusFilter, searchQuery);
+  };
+
   return (
-    <div className="p-6">
+    <TablePageLayout
+      title="Categorías"
+      description="Gestiona las categorías de los cursos"
+      action={
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="inline-flex items-center justify-center px-4 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+        >
+          <span className="mr-2 text-lg leading-none">+</span>
+          Crear Categoría
+        </button>
+      }
+    >
       <div className="mb-4">
-        <h1 className="text-2xl font-bold mb-4">Categorias</h1>
         <Table
           headers={headers}
           data={categories}
@@ -172,9 +198,18 @@ export default function Categories() {
           }}
           onFilterChange={handleFilterChange}
           onSearchChange={handleSearchChange}
+          onReload={handleReload}
         />
       </div>
       {error && <div className="text-red-600 mt-2">{error}</div>}
+
+      {/* Modal para crear categoría */}
+      <CategoryCreation
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateSuccess}
+      />
+
       {/* Modal para editar categoría */}
       <CategoryEdition
         isOpen={isModalOpen}
@@ -182,7 +217,7 @@ export default function Categories() {
           setIsModalOpen(false);
           setSelectedCategory(null);
         }}
-        onSubmit={handleEditCategory}
+        onSubmit={handleSaveCategory}
         category={selectedCategory}
       />
       <ConfirmDialog
@@ -197,6 +232,6 @@ export default function Categories() {
         title="¿Eliminar categoría?"
         message="Estás a punto de eliminar esta categoría. Esta acción no se puede deshacer. ¿Deseas continuar?"
       />
-    </div>
+    </TablePageLayout>
   );
 }

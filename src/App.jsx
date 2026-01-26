@@ -6,12 +6,12 @@ import Cursos from './pages/Cursos.jsx'
 import CourseDetail from './pages/courses/CourseDetail.jsx'
 import FormCourse from './pages/courses/FormCourse.jsx'
 import Estudiantes from './pages/Estudiantes.jsx'
-import Inscritos from './pages/inscritos.jsx'
+import Inscritos from './pages/Inscritos.jsx'
 import ConfiguracionHome from './pages/ConfiguracionHome.jsx'
 import { isAuthenticated } from './utils/auth'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import Categories from './pages/courses/Categories.jsx'
+import Categories from './pages/Categories.jsx'
 
 
 // Componente para proteger rutas (solo entra si hay token)
@@ -37,22 +37,22 @@ function App() {
       />
       <Routes>
         {/* Página pública */}
-        <Route path="/login" className="h-screen" element={<Login/>} />
+        <Route path="/login" className="h-screen" element={<Login />} />
 
         {/* Rutas privadas dentro del dashboard */}
         <Route
           path="/dashboard/*"
           element={
             <PrivateRoute>
-              <Dashboard/>
+              <Dashboard />
             </PrivateRoute>
           }
-          
+
         >
-          <Route index element={<Navigate to="cursos" replace />} />  
+          <Route index element={<Navigate to="cursos" replace />} />
           <Route path="cursos" element={<Cursos />} />
           <Route path="cursos/:id" element={<CourseDetail />} />
-          <Route path="cursos/:id/editar" element ={<FormCourse />} />
+          <Route path="cursos/:id/editar" element={<FormCourse />} />
           <Route path="cursos/:course_id/inscritos" element={<Inscritos />} />
           <Route path="estudiantes" element={<Estudiantes />} />
           <Route path="categorias" element={<Categories />} />

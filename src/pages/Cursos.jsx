@@ -7,6 +7,7 @@ import {
 import { EyeIcon } from "@heroicons/react/16/solid";
 import { useNavigate } from "react-router-dom";
 import { Table } from "../components/ui";
+import { TablePageLayout } from "../components/layout";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -176,12 +177,10 @@ export default function Cursos() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Gestión de Cursos</h1>
-          <p className="text-sm text-gray-500 mt-1">Administra el catálogo de cursos disponibles</p>
-        </div>
+    <TablePageLayout
+      title="Gestión de Cursos"
+      description="Administra el catálogo de cursos disponibles"
+      action={
         <button
           onClick={() => navigate("/dashboard/cursos/crear/editar")}
           className="inline-flex items-center justify-center px-4 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
@@ -189,43 +188,41 @@ export default function Cursos() {
           <span className="mr-2 text-lg leading-none">+</span>
           Crear Nuevo Curso
         </button>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
-        <Table
-          headers={headers}
-          data={courses}
-          filters={filters}
-          page={page}
-          pageSize={pageSize}
-          total={total}
-          totalPages={totalPages}
-          loading={loading}
-          onPageChange={(newPage) =>
-            loadCourses(
-              categorySelected || "Todos",
-              newPage,
-              pageSize,
-              statusFilter,
-              searchQuery,
-            )
-          }
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize);
-            loadCourses(
-              categorySelected || "Todos",
-              1,
-              newSize,
-              statusFilter,
-              searchQuery,
-            );
-          }}
-          onFilterChange={handleFilterChange}
-          onSearchChange={handleSearchChange}
-          onReload={handleReload}
-        />
-      </div>
+      }
+    >
+      <Table
+        headers={headers}
+        data={courses}
+        filters={filters}
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        totalPages={totalPages}
+        loading={loading}
+        onPageChange={(newPage) =>
+          loadCourses(
+            categorySelected || "Todos",
+            newPage,
+            pageSize,
+            statusFilter,
+            searchQuery,
+          )
+        }
+        onPageSizeChange={(newSize) => {
+          setPageSize(newSize);
+          loadCourses(
+            categorySelected || "Todos",
+            1,
+            newSize,
+            statusFilter,
+            searchQuery,
+          );
+        }}
+        onFilterChange={handleFilterChange}
+        onSearchChange={handleSearchChange}
+        onReload={handleReload}
+      />
       {error && <div className="text-red-500 text-sm mt-2 px-1">{error}</div>}
-    </div>
+    </TablePageLayout>
   );
 }

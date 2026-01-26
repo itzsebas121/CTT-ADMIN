@@ -1,61 +1,81 @@
-import {useEffect, useState} from 'react';
-import { updateCategory, uploadCategorySVG } from '../../api/categories';
+import { useEffect, useState } from 'react';
+import { updateCategory, uploadCategorySVG, createCategory } from '../../api/categories';
+
 const CategoryEdition = ({ isOpen, onClose, onSubmit, category }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     svgurl: "",
     status: "activo",
-    });
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [filesvg, setFilesvg] = useState(null);
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [filesvg, setFilesvg] = useState(null);
+  const isEditing = !!category;
 
-    useEffect(() => {
-        if (category) {
-            setFormData({
-                name: category.name || "",
-                description: category.description || "",
-                svgurl: category.svgurl || "",
-                status: category.status || "activo",
-            });
-        }
-    }, [category]);
+  useEffect(() => {
+    if (category) {
+      setFormData({
+        name: category.name || "",
+        description: category.description || "",
+        svgurl: category.svgurl || "",
+        status: category.status || "activo",
+      });
+    } else {
+      // Reset form for creation
+      setFormData({
+        name: "",
+        description: "",
+        svgurl: "",
+        status: "activo",
+      });
+      setFilesvg(null);
+    }
+  }, [category, isOpen]);
 
-    const handleChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
-    const handleSubmit = async (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     try {
-        let formDataToSubmit = { ...formData };
-        if (filesvg) {
-            const responsesvg = await uploadCategorySVG(filesvg);
-            formDataToSubmit={
-                ...formDataToSubmit,
-                svgurl: responsesvg.svg_url,
-            };
-        }
-        const result = await updateCategory(category.id, formDataToSubmit);
-        onSubmit(result);
-        onClose();
-    }catch (err) {
-        setError(err.message);
-        console.error('Error completo:', err);
-        console.error('Error response:', err.response);
-        console.error('Error data:', err.response?.data);
-        setError(JSON.stringify(err.response?.data) || err.message);
-    }finally {
-        setIsLoading(false);
+      let formDataToSubmit = { ...formData };
+      if (filesvg) {
+        const responsesvg = await uploadCategorySVG(filesvg);
+        formDataToSubmit = {
+          ...formDataToSubmit,
+          svgurl: responsesvg.svg_url,
+        };
+      }
+
+      let result;
+      if (isEditing) {
+        result = await updateCategory(category.id, formDataToSubmit);
+      } else {
+        result = await createCategory(formDataToSubmit);
+      }
+
+      onSubmit(result);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+      console.error('Error completo:', err);
+      console.error('Error response:', err.response);
+      console.error('Error data:', err.response?.data);
+      setError(JSON.stringify(err.response?.data) || err.message);
+    } finally {
+      setIsLoading(false);
     }
-};
-    const handleClose = () => {
+  };
+
+  const handleClose = () => {
     setFormData({
       name: "",
       description: "",
@@ -63,9 +83,11 @@ const CategoryEdition = ({ isOpen, onClose, onSubmit, category }) => {
       status: "activo",
     });
     setFilesvg(null);
+    setError(null);
     onClose();
   };
-    const handleFileChange = (e) => {
+
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type === "image/svg+xml") {
       setFormData((prev) => ({
@@ -76,9 +98,11 @@ const CategoryEdition = ({ isOpen, onClose, onSubmit, category }) => {
     } else if (file) {
       setError("Por favor, selecciona un archivo SVG válido.");
     }
-    };
-    if (!isOpen) return null;
-    return (
+  };
+
+  if (!isOpen) return null;
+
+  return (
     <div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
       onClick={handleClose}
@@ -89,7 +113,7 @@ const CategoryEdition = ({ isOpen, onClose, onSubmit, category }) => {
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
-            Editar Categoría
+            {isEditing ? "Editar Categoría" : "Crear Categoría"}
           </h2>
           <button
             className="text-gray-500 hover:text-gray-700 text-3xl leading-none"
@@ -147,9 +171,9 @@ const CategoryEdition = ({ isOpen, onClose, onSubmit, category }) => {
               htmlFor="svgurl"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Archivo SVG {formData.svgurl && "(Opcional - Dejar vacío para mantener el actual)"}
+              Archivo SVG {formData.svgurl && isEditing && "(Opcional - Dejar vacío para mantener el actual)"}
             </label>
-            {formData.svgurl && !filesvg && (
+            {formData.svgurl && !filesvg && isEditing && (
               <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700">
                 SVG actual: {formData.svgurl.split('/').pop()}
               </div>
@@ -169,7 +193,7 @@ const CategoryEdition = ({ isOpen, onClose, onSubmit, category }) => {
               <span className="text-shadow-gray-50">
                 {formData.svgfile
                   ? formData.svgfile.name
-                  : "Seleccionar Nuevo Archivo"}
+                  : (isEditing ? "Seleccionar Nuevo Archivo (Opcional)" : "Seleccionar Archivo SVG")}
               </span>
               <svg
                 className="w-5 h-5 text-shadow-gray-50"
@@ -220,7 +244,7 @@ const CategoryEdition = ({ isOpen, onClose, onSubmit, category }) => {
               disabled={isLoading}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
             >
-              {isLoading ? "Actualizando..." : "Actualizar Categoría"}
+              {isLoading ? (isEditing ? "Actualizando..." : "Creando...") : (isEditing ? "Actualizar Categoría" : "Crear Categoría")}
             </button>
           </div>
         </form>
