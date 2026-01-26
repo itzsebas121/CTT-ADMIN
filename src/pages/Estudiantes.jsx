@@ -24,7 +24,7 @@ export default function Estudiantes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(7);
+  const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [typeFilter, setTypeFilter] = useState(null);
@@ -81,12 +81,17 @@ export default function Estudiantes() {
     }
   };
 
+  const handleReload = () => {
+    loadUsers(page, pageSize, typeFilter);
+  };
+
   return (
-    <div className="p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Estudiantes</h1>
+    <div className="p-6 space-y-6">
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Gestión de Estudiantes</h1>
+        <p className="text-sm text-gray-500 mt-1">Administra la información de los estudiantes y usuarios</p>
       </div>
-      <div className="mb-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
         <Table
           headers={headers}
           data={users}
@@ -104,9 +109,10 @@ export default function Estudiantes() {
             loadUsers(1, newSize, typeFilter);
           }}
           onFilterChange={handleFilterChange}
+          onReload={handleReload}
         />
       </div>
-      {error && <div className="text-red-600 mt-2">{error}</div>}
+      {error && <div className="text-red-500 text-sm mt-2 px-1">{error}</div>}
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function Cursos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(7);
+  const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [categorySelected, setCategorySelected] = useState(null);
@@ -165,19 +165,33 @@ export default function Cursos() {
     setSearchQuery(value);
   };
 
+  const handleReload = () => {
+    loadCourses(
+      categorySelected || "Todos",
+      page,
+      pageSize,
+      statusFilter,
+      searchQuery
+    );
+  };
+
   return (
-    <div className="p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Cursos</h1>
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Gestión de Cursos</h1>
+          <p className="text-sm text-gray-500 mt-1">Administra el catálogo de cursos disponibles</p>
+        </div>
         <button
           onClick={() => navigate("/dashboard/cursos/crear/editar")}
-          className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition"
+          className="inline-flex items-center justify-center px-4 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
         >
-          + Crear curso
+          <span className="mr-2 text-lg leading-none">+</span>
+          Crear Nuevo Curso
         </button>
       </div>
 
-      <div className="mb-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
         <Table
           headers={headers}
           data={courses}
@@ -208,9 +222,10 @@ export default function Cursos() {
           }}
           onFilterChange={handleFilterChange}
           onSearchChange={handleSearchChange}
+          onReload={handleReload}
         />
       </div>
-      {error && <div className="text-red-600 mt-2">{error}</div>}
+      {error && <div className="text-red-500 text-sm mt-2 px-1">{error}</div>}
     </div>
   );
 }
