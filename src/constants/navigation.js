@@ -14,23 +14,17 @@ export const headerNavigation = [
 
 // Menú del dashboard administrativo
 export const dashboardMenuItems = [
-  { 
-    name: "Cursos", 
+  {
+    name: "Cursos",
     path: "/dashboard/cursos",
     subItems: [
-        { name: "Todos los Cursos", path: "/dashboard/cursos/" },
+      { name: "Administrar Cursos", path: "/dashboard/cursos/" },
+      { name: "Administrar Categorías", path: "/dashboard/categorias" },
+      { name: "Administrar Estudiantes", path: "/dashboard/estudiantes" },
     ]
   },
   {
-    name: "Categorías",
-    path: "/dashboard/categorias"
-  },
-  { 
-    name: "Estudiantes", 
-    path: "/dashboard/estudiantes"
-  },
-  { 
-    name: "Configuración", 
+    name: "Configuración",
     path: "/dashboard/configuracion",
     subItems: [
       { name: "Configuración Home", path: "/dashboard/configuracion/home" },
