@@ -10,7 +10,7 @@ export default function Table({
   total = 0,
   totalPages = 1,
   loading = false,
-  loadingContent= false,
+  loadingContent = false,
   onPageChange,
   onPageSizeChange,
   onFilterChange,
@@ -55,8 +55,8 @@ export default function Table({
       const matchesSearch = !search
         ? true
         : headers.some((header) =>
-            String(row[header]).toLowerCase().includes(search.toLowerCase())
-          );
+          String(row[header]).toLowerCase().includes(search.toLowerCase())
+        );
 
       // Filtros por columna
       const matchesFilters = headers.every((header) => {
@@ -125,59 +125,57 @@ export default function Table({
       {/* Tabla */}
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            {loading ? (<TableLoading />) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-[#6C1313]">
-                <tr>
-                  {headers.map((header, idx) => (
-                    <th
-                      key={idx}
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.length > 0 ? (
-                  filteredData.map((row, rowIndex) => (
-                    <tr
-                      key={rowIndex}
-                      className={
-                        rowIndex % 2 === 0
-                          ? "bg-white hover:bg-gray-100"
-                          : "bg-gray-50 hover:bg-gray-100"
-                      }
-                    >
-                      {headers.map((header, colIndex) => (
-                        <td
-                          key={colIndex}
-                          className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                        >
-                          {row[header]}
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                ) : (
+          <div className="shadow-lg ring-1 ring-black/5 overflow-hidden rounded-xl bg-white">
+            {loading ? (
+              <TableLoading rows={pageSize} cols={headers.length} />
+            ) : (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-[#6C1313] sticky top-0 z-10">
                   <tr>
-                    <td
-                      colSpan={headers.length}
-                      className="px-6 py-4 text-center text-sm text-gray-500"
-                    >
-                      {loadingContent ? 'cargando...' : "No se encontraron resultados"}
-                    </td>
+                    {headers.map((header, idx) => (
+                      <th
+                        key={idx}
+                        scope="col"
+                        className="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider shadow-sm"
+                      >
+                        {header}
+                      </th>
+                    ))}
                   </tr>
-                )}
-              </tbody>
-            </table>)}
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredData.length > 0 ? (
+                    filteredData.map((row, rowIndex) => (
+                      <tr
+                        key={rowIndex}
+                        className="hover:bg-[#6C1313]/5 transition-colors duration-150"
+                      >
+                        {headers.map((header, colIndex) => (
+                          <td
+                            key={colIndex}
+                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                          >
+                            {row[header]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={headers.length}
+                        className="px-6 py-4 text-center text-sm text-gray-500"
+                      >
+                        {loadingContent ? 'cargando...' : "No se encontraron resultados"}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>)}
           </div>
         </div>
-      </div> 
-  
+      </div>
+
 
       {/* Paginación dentro de Table */}
       <div className="flex items-center justify-between mt-3 flex-col">

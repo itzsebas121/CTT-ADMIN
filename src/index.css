@@ -42,9 +42,11 @@ button {
   color: white;
   background-color: #CB972D;
 }
+
 button:hover {
   background-color: #916500;
 }
+
 button:focus,
 button:focus-visible {
   background-color: #916500;
@@ -62,27 +64,82 @@ button.rojo {
   color: white;
   background: #6C1313;
 }
+
 button.rojo:hover {
   background-color: #5a0f0f;
 }
+
 button.rojo:focus,
 button.rojo:focus-visible {
   background-color: #5a0f0f;
   outline: none;
   box-shadow: 0 0 0 2px rgba(108, 19, 19, 0.5);
 }
+
 button.rojo:active {
   background-color: #4a0c0c;
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE y Edge */
-  scrollbar-width: none;     /* Firefox */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari y Opera */
+  -ms-overflow-style: none;
+  /* IE y Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
-.NavLink{
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari y Opera */
+}
+
+.NavLink {
   color: #6C1313;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-wrapper::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.4) 20%,
+      rgba(255, 255, 255, 0.7) 60%,
+      rgba(255, 255, 255, 0));
+  animation: shimmer 1.5s infinite;
+  content: '';
 }

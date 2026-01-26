@@ -17,17 +17,19 @@ export const dashboardMenuItems = [
   {
     name: "Cursos",
     path: "/dashboard/cursos",
+    icon: "AcademicCapIcon",
     subItems: [
-      { name: "Administrar Cursos", path: "/dashboard/cursos/" },
-      { name: "Administrar Categorías", path: "/dashboard/categorias" },
-      { name: "Administrar Estudiantes", path: "/dashboard/estudiantes" },
+      { name: "Administrar Cursos", path: "/dashboard/cursos/", icon: "BookOpenIcon" },
+      { name: "Administrar Categorías", path: "/dashboard/categorias", icon: "TagIcon" },
+      { name: "Administrar Estudiantes", path: "/dashboard/estudiantes", icon: "UserGroupIcon" },
     ]
   },
   {
     name: "Configuración",
     path: "/dashboard/configuracion",
+    icon: "Cog6ToothIcon",
     subItems: [
-      { name: "Configuración Home", path: "/dashboard/configuracion/home" },
+      { name: "Configuración Home", path: "/dashboard/configuracion/home", icon: "HomeIcon" },
     ]
   },
 ];
