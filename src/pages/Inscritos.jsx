@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/16/solid";
 import { Table } from "../components/ui";
 import { TablePageLayout } from "../components/layout";
-import { getEnrolledUsers } from "../api/enrolled_users";
+import { getEnrolledUsers, searchEnrolledUsers } from "../api/enrolled_users";
 import { getCourseById } from "../api/courses";
 
 
@@ -22,19 +22,39 @@ export default function Inscritos() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [filters, setFilters] = useState({});
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Effect to trigger load when debounced query changes
+  useEffect(() => {
     if (course_id) {
-      loadEnrrolledUsers(course_id, page, pageSize, searchQuery);
+      loadEnrrolledUsers(course_id, 1, pageSize, debouncedSearchQuery);
+    }   
+  }, [debouncedSearchQuery]);
+
+  useEffect(() => {
+    if (course_id) {
+      loadEnrrolledUsers(course_id, page, pageSize, debouncedSearchQuery);
     }
   }, [course_id]);
 
-  const loadEnrrolledUsers = async (courseId, currentPage, currentPageSize) => {
+  const loadEnrrolledUsers = async (courseId, currentPage, currentPageSize, query) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getEnrolledUsers(courseId);
+      let response;
+      if (query && query.trim().length > 0) {
+        response = await searchEnrolledUsers(courseId, query);
+      } else {
+        response = await getEnrolledUsers(courseId);
+      }
       const enrollments = response.enrollments || [];
       const transformedCourses = enrollments.map((enrollment) => ({
         id: enrollment.id,
@@ -57,26 +77,25 @@ export default function Inscritos() {
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
-    loadEnrrolledUsers(course_id, newPage, pageSize, searchQuery);
+    loadEnrrolledUsers(course_id, newPage, pageSize, debouncedSearchQuery);
   };
 
   const handlePageSizeChange = (newSize) => {
     setPageSize(newSize);
     setPage(1);
-    loadEnrrolledUsers(course_id, 1, newSize, searchQuery);
+    loadEnrrolledUsers(course_id, 1, newSize, debouncedSearchQuery);
   };
 
   const handleSearchChange = (query) => {
     setSearchQuery(query);
-    setPage(1);
-    loadEnrrolledUsers(course_id, 1, pageSize, query);
+    // Debounce effect will handle the load
   };
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
   };
 
   const handleReload = () => {
-    loadEnrrolledUsers(course_id, page, pageSize, searchQuery);
+    loadEnrrolledUsers(course_id, page, pageSize, debouncedSearchQuery);
   };
 
   return (

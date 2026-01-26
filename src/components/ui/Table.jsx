@@ -15,7 +15,7 @@ export default function Table({
   onPageSizeChange,
   onFilterChange,
   onSearchChange,
-  onReload, // Nuevo prop
+  onReload,
 }) {
   const [search, setSearch] = useState("");
   const [columnFilters, setColumnFilters] = useState({});

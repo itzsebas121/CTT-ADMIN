@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getUsers } from "../api/users";
+import { getUsers, searchUsers } from "../api/users";
 import { Table } from "../components/ui";
 import { TablePageLayout } from "../components/layout";
 import AOS from "aos";
@@ -29,17 +29,24 @@ export default function Estudiantes() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [typeFilter, setTypeFilter] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const loadUsers = async (
     pageRequested = 1,
     pageSizeRequested = pageSize,
-    type = typeFilter
+    type = typeFilter,
+    query = searchQuery
   ) => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await getUsers(pageRequested, pageSizeRequested, type);
+      let response;
+      if (query && query.trim().length > 0) {
+        response = await searchUsers(query, pageRequested, pageSizeRequested, type);
+      } else {
+        response = await getUsers(pageRequested, pageSizeRequested, type);
+      }
 
       const usersArray = response?.users || [];
       const respTotal = response?.total ?? 0;
@@ -75,15 +82,27 @@ export default function Estudiantes() {
     loadUsers();
   }, []);
 
+  // Efecto para manejar la búsqueda con debounce
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      loadUsers(1, pageSize, typeFilter, searchQuery);
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
+  };
+
   const handleFilterChange = (filterColumn, value) => {
     if (filterColumn === "tipo") {
       setTypeFilter(value);
-      loadUsers(1, pageSize, value);
+      loadUsers(1, pageSize, value, searchQuery);
     }
   };
 
   const handleReload = () => {
-    loadUsers(page, pageSize, typeFilter);
+    loadUsers(page, pageSize, typeFilter, searchQuery);
   };
 
   return (
@@ -101,13 +120,14 @@ export default function Estudiantes() {
         totalPages={totalPages}
         loading={loading}
         onPageChange={(newPage) =>
-          loadUsers(newPage, pageSize, typeFilter)
+          loadUsers(newPage, pageSize, typeFilter, searchQuery)
         }
         onPageSizeChange={(newSize) => {
           setPageSize(newSize);
-          loadUsers(1, newSize, typeFilter);
+          loadUsers(1, newSize, typeFilter, searchQuery);
         }}
         onFilterChange={handleFilterChange}
+        onSearchChange={handleSearchChange}
         onReload={handleReload}
       />
       {error && <div className="text-red-500 text-sm mt-2 px-1">{error}</div>}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Table from "../components/ui/Table";
 import { TablePageLayout } from "../components/layout";
-import { getAllCategories } from "../api/categories";
+import { getAllCategories, searchCategories } from "../api/categories";
 import CategoryEdition from "../components/ui/CategoryEdition";
 import CategoryCreation from "../components/ui/CategoryCreation";
 import { deleteCategory } from "../api/categories";
@@ -65,12 +65,23 @@ export default function Categories() {
     try {
       setLoading(true);
       setError(null);
-      const data = await getAllCategories(
-        pageRequested,
-        pageSizeRequested,
-        status_filter,
-        query,
-      );
+      setLoading(true);
+      setError(null);
+      let data;
+      if (query && query.trim().length > 0) {
+        data = await searchCategories(
+          query.trim(),
+          pageRequested,
+          pageSizeRequested,
+          status_filter
+        );
+      } else {
+        data = await getAllCategories(
+          pageRequested,
+          pageSizeRequested,
+          status_filter
+        );
+      }
       const categoriesArray = Array.isArray(data)
         ? data
         : data?.items || [];

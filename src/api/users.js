@@ -34,3 +34,42 @@ export const getUsers = async (page = 1, pageSize = 10, type = null) => {
         throw new Error(`Error de red: ${error.message}`);
     }
 };
+
+/**
+ * Busca usuarios por nombre, email o identificación
+ * @param {string} query - Término de búsqueda
+ * @param {number} page - Número de página
+ * @param {number} pageSize - Tamaño de página
+ * @param {string|null} type - Tipo de usuario (opcional)
+ * @returns {Promise<Object>} Resultados de la búsqueda
+ */
+export const searchUsers = async (query, page = 1, pageSize = 10, type = null) => {
+    try {
+        const params = {
+            query,
+            page,
+            page_size: pageSize
+        };
+
+        if (type) {
+            params.type = type;
+        }
+
+        const token = localStorage.getItem('token');
+        const response = await api.get('/users/search', {
+            params,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (error.code === 'ECONNABORTED') {
+            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
+        }
+        if (error.response) {
+            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
+        }
+        throw new Error(`Error de red: ${error.message}`);
+    }
+};
