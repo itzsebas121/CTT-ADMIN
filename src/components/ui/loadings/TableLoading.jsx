@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function TableLoading({ cols = 4, rows = 5 }) {
   // Retornamos un fragmento para que pueda ser insertado directamente en <tbody>
   return (
