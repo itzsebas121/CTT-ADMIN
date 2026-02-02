@@ -55,7 +55,7 @@ export default function Inscritos() {
       } else {
         response = await getEnrolledUsers(courseId);
       }
-      const enrollments = response.enrollments || [];
+      const enrollments = response.items || [];
       const transformedCourses = enrollments.map((enrollment) => ({
         id: enrollment.id,
         Nombre: enrollment.user_name,
@@ -64,8 +64,9 @@ export default function Inscritos() {
         "fecha de inscripcion": new Date(enrollment.enrollment_date).toLocaleDateString(),
       }));
       setEnrolledUsers(transformedCourses);
-      setTotal(response.total || 0);
-      setTotalPages(Math.ceil((response.total || 0) / currentPageSize));
+      setTotal(response.pagination.total || 0);
+      console.log('reponse:', response.pagination);
+      setTotalPages(response.pagination.total_pages || 0);
       setCourse(course || "");
 
     } catch (err) {

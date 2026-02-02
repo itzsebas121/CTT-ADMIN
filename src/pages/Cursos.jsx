@@ -62,6 +62,7 @@ export default function Cursos() {
               status,
             )
             : await getCourses(pageRequested, pageSizeRequested, status);
+        console.log('Courses response:', response);
       }
 
       // Manejar ambos formatos de respuesta

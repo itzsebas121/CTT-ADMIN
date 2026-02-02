@@ -7,6 +7,7 @@ export const getEnrolledUsers = async (courseId) => {
       Authorization: `Bearer ${token}`,
     },
   });
+  console.log("Enrolled Users Response:", response.data);
   return response.data;
 };
 
