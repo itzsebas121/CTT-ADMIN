@@ -79,7 +79,7 @@ export default function Estudiantes() {
   useEffect(() => {
     AOS.init({ duration: 1000, once: false, mirror: true });
     AOS.refresh();
-    loadUsers();
+    // loadUsers() removed to prevent double fetch since searchQuery effect triggers it
   }, []);
 
   // Efecto para manejar la búsqueda con debounce

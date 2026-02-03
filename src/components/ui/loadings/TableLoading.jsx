@@ -8,7 +8,7 @@ export default function TableLoading({ cols = 4, rows = 5 }) {
             <td key={`loading-cell-${rowIndex}-${colIndex}`} className="px-6 py-4 whitespace-nowrap">
               <div
                 className="h-4 bg-gray-100 rounded shimmer-wrapper relative overflow-hidden"
-                style={{ width: `${Math.floor(Math.random() * (90 - 40 + 1)) + 40}%` }}
+                style={{ width: `${((colIndex % 3) + 2) * 20}%` }}
               ></div>
             </td>
           ))}

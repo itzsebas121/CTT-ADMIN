@@ -124,7 +124,7 @@ export default function Cursos() {
   useEffect(() => {
     AOS.init({ duration: 1000, once: false, mirror: true });
     AOS.refresh();
-    loadCourses();
+    // loadCourses() removed to prevent double fetch since searchQuery effect triggers it
   }, []);
 
   // Efecto para manejar la búsqueda con debounce

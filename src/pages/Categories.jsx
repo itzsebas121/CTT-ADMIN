@@ -27,7 +27,7 @@ export default function Categories() {
   const [statusFilter, setStatusFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
-    loadCategories();
+    // loadCategories() removed to prevent double fetch since searchQuery effect triggers it
   }, []);
 
   const handleDeleteCategory = async (categoryId) => {
