@@ -106,9 +106,9 @@ export default function Menu() {
 
       {/* Menú lateral */}
       <aside className={`
-        w-64 bg-gradient-to-b from-primary to-primary-active text-white flex flex-col
-        fixed lg:static inset-y-0 left-0 z-40 shadow-xl
-        transform transition-transform duration-300 ease-in-out
+        w-72 bg-gradient-to-b from-[#6C1313] to-[#4a0c0c] text-white flex flex-col
+        fixed lg:static inset-y-0 left-0 z-40 shadow-2xl
+        transform transition-transform duration-300 ease-in-out border-r border-white/5
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Encabezado del panel */}
@@ -122,25 +122,26 @@ export default function Menu() {
           {dashboardMenuItems.map((item, index) => {
             const Icon = item.icon ? iconMap[item.icon] : null;
             return (
-              <div key={item.path} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+              <div key={item.path} className="animate-fade-in px-3" style={{ animationDelay: `${index * 50}ms` }}>
                 {item.subItems ? (
-                  <div className="space-y-1">
+                  <div className="space-y-1 mb-1">
                     {/* Item con subsecciones */}
                     <button
                       onClick={() => toggleSubmenu(item.path)}
-                      className="w-full flex items-center justify-between px-3 py-2 text-white/90 font-bold uppercase text-xs tracking-wider hover:bg-white/10 rounded-lg transition-colors group !bg-transparent !border-none cursor-pointer"
+                      className={`w-full flex items-center justify-between px-3 py-2.5 text-white/90 font-medium text-sm hover:bg-white/10 rounded-xl transition-all duration-200 group !bg-transparent !border-none cursor-pointer ${openSubmenus[item.path] ? 'bg-white/5' : ''}`}
                     >
                       <div className="flex items-center">
-                        {Icon && <Icon className="w-5 h-5 mr-2 opacity-70" />}
-                        {item.name}
+                        {Icon && <Icon className={`w-5 h-5 mr-3 transition-opacity duration-200 ${openSubmenus[item.path] ? 'opacity-100 text-secondary' : 'opacity-70 group-hover:opacity-100'}`} />}
+                        <span className="tracking-wide">{item.name}</span>
                       </div>
                       <ChevronDownIcon
-                        className={`w-4 h-4 transition-transform duration-200 ${openSubmenus[item.path] ? 'rotate-180' : ''}`}
+                        className={`w-4 h-4 text-white/50 transition-transform duration-300 ease-in-out ${openSubmenus[item.path] ? 'rotate-180 text-white' : ''}`}
                       />
                     </button>
 
                     {/* Subsecciones */}
-                    <div className={`ml-2 space-y-1 border-l-2 border-white/10 pl-2 overflow-hidden transition-all duration-300 ${openSubmenus[item.path] ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <div className={`space-y-1 overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${openSubmenus[item.path] ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className="py-1 ml-4 pl-3 border-l border-white/10 space-y-1">
                       {item.subItems.map((subItem) => {
                         const SubIcon = subItem.icon ? iconMap[subItem.icon] : null;
                         return (
@@ -149,10 +150,10 @@ export default function Menu() {
                             to={subItem.path}
                             onClick={() => setIsOpen(false)}
                             className={({ isActive }) =>
-                              `flex items-center px-3 py-2 rounded-lg transition-all duration-300 group
+                              `flex items-center px-3 py-2 rounded-lg transition-all duration-200 group
                               ${isActive
-                                ? "bg-white/15 text-white font-semibold shadow-sm backdrop-blur-sm translate-x-1"
-                                : "text-white/70 hover:bg-white/10 hover:text-white hover:translate-x-1"}`
+                                ? "bg-white/20 text-white font-semibold shadow-sm backdrop-blur-sm"
+                                : "text-white/60 hover:bg-white/10 hover:text-white"}`
                             }
                           >
                             {SubIcon && <SubIcon className="w-4 h-4 mr-3 opacity-70 group-hover:opacity-100 transition-opacity" />}
@@ -160,6 +161,7 @@ export default function Menu() {
                           </NavLink>
                         )
                       })}
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -168,14 +170,14 @@ export default function Menu() {
                     to={item.path}
                     onClick={() => setIsOpen(false)}
                     className={({ isActive }) =>
-                      `flex items-center px-3 py-3 rounded-lg transition-all duration-300 group mb-2
+                      `flex items-center px-3 py-3 rounded-xl transition-all duration-200 group mb-1
                       ${isActive
-                        ? "bg-white/15 text-white font-semibold shadow-sm backdrop-blur-sm translate-x-1"
-                        : "text-white/70 hover:bg-white/10 hover:text-white hover:translate-x-1"}`
+                        ? "bg-white/20 text-white font-semibold shadow-lg shadow-black/5 backdrop-blur-sm border border-white/10"
+                        : "text-white/70 hover:bg-white/10 hover:text-white"}`
                     }
                   >
-                    {Icon && <Icon className="w-5 h-5 mr-3 opacity-70 group-hover:opacity-100 transition-opacity" />}
-                    <span className="text-sm font-medium">{item.name}</span>
+                    {Icon && <Icon className="w-5 h-5 mr-3 opacity-70 group-hover:opacity-100 transition-opacity text-secondary" />}
+                    <span className="text-sm font-medium tracking-wide">{item.name}</span>
                   </NavLink>
                 )}
               </div>
@@ -185,16 +187,16 @@ export default function Menu() {
 
         {/* Información del usuario */}
         {user && (
-          <div className="p-4 border-t border-white/30">
+          <div className="p-4 mx-3 mb-2 bg-black/20 rounded-xl border border-white/5 backdrop-blur-sm">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary font-bold text-xl">
+              <div className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center text-primary font-bold text-lg ring-2 ring-white/20">
                 {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">
+                <p className="text-sm font-bold text-white truncate leading-tight">
                   {user.username || user.firstname + " " + user.lastname || 'Usuario'}
                 </p>
-                <p className="text-xs text-white/80 truncate">
+                <p className="text-xs text-white/60 truncate mt-0.5 font-medium">
                   {user.email || ''}
                 </p>
               </div>
@@ -203,15 +205,15 @@ export default function Menu() {
         )}
 
         {/* Botón de cerrar sesión */}
-        <div className="p-4 border-t border-white/30">
+        <div className="px-4 pb-4">
           <button
             onClick={handleLogoutClick}
-            className="w-full flex items-center justify-center space-x-2 p-2 bg-red-700 text-white rounded hover:bg-red-800 transition-colors duration-200 font-semibold"
+            className="w-full flex items-center justify-center space-x-2 p-2.5 bg-red-600/90 text-white rounded-xl hover:bg-red-700 transition-all duration-200 font-medium shadow-lg shadow-red-900/20 hover:shadow-red-900/40 border border-white/10 group"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span>Cerrar Sesión</span>
+            <span className="tracking-wide">Cerrar Sesión</span>
           </button>
         </div>
       </aside>

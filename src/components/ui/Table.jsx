@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon, FunnelIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import TableLoading from "./loadings/TableLoading";
+import Select from "./Select";
 
 export default function Table({
   headers = [],
@@ -100,22 +101,16 @@ export default function Table({
         <div className="flex flex-wrap gap-3">
           {headers.map((header) =>
             filters[header] ? (
-              <div key={header} className="relative group">
-                <select
-                  value={columnFilters[header] || "All"}
-                  onChange={(e) => handleFilterChange(header, e.target.value)}
-                  className="appearance-none pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-sm hover:border-primary transition-all duration-200 cursor-pointer font-medium"
-                >
-                  <option value="All">Todos </option>
-                  {filters[header].map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <FunnelIcon className="h-4 w-4 text-gray-400 group-hover:text-primary transition-colors duration-200" />
-                </div>
+              <div key={header} className="w-48">
+                 <Select 
+                    value={columnFilters[header] || "All"}
+                    onChange={(value) => handleFilterChange(header, value)}
+                    options={[
+                        { value: 'All', label: 'Todos' }, 
+                        ...filters[header].map(opt => ({ value: opt, label: opt }))
+                    ]}
+                    placeholder={`Filtrar ${header}`}
+                 />
               </div>
             ) : null
           )}
@@ -123,8 +118,8 @@ export default function Table({
       </div>
 
       {/* Tabla Principal */}
-      <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col">
-        <div className="overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col">
+        <div className="overflow-x-auto min-h-[400px] rounded-t-xl">
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="bg-primary">
@@ -132,7 +127,9 @@ export default function Table({
                   <th
                     key={idx}
                     scope="col"
-                    className="px-6 py-5 text-left text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap"
+                    className={`px-6 py-5 text-left text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap sticky top-0 z-10 
+                      ${idx === 0 ? 'rounded-tl-xl' : ''} 
+                      ${idx === headers.length - 1 ? 'rounded-tr-xl' : ''}`}
                   >
                     {header}
                   </th>
@@ -182,7 +179,7 @@ export default function Table({
 
         {/* Barra de Paginación */}
         {total > 0 && (
-          <div className="px-3 py-3 sm:px-4 sm:py-3 md:px-6 md:py-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="px-3 py-3 sm:px-4 sm:py-3 md:px-6 md:py-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 rounded-b-xl">
 
             {/* Información de Registros */}
             <div className="text-xs md:text-sm text-gray-500 font-medium bg-white px-2.5 py-1 md:px-3 rounded-md border border-gray-200 shadow-sm order-last sm:order-first">
@@ -230,21 +227,16 @@ export default function Table({
               {/* Selector de Filas */}
               <div className="flex items-center gap-2 bg-white px-2.5 py-1.5 md:px-3 rounded-lg border border-gray-200 shadow-sm text-xs md:text-sm">
                 <span className="text-gray-400 uppercase font-semibold tracking-wide">Ver</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => onPageSizeChange && onPageSizeChange(Number(e.target.value))}
-                  className="font-medium text-gray-700 bg-transparent focus:outline-none cursor-pointer hover:text-primary transition-colors"
-                >
-                  {[10, 20, 50].map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                </select>
+                 <div className="w-20">
+                    <Select
+                        value={pageSize}
+                        onChange={(val) => onPageSizeChange && onPageSizeChange(Number(val))}
+                        options={[10, 20, 50]}
+                        className="!w-20"
+                    />
+                 </div>
                 <span className="text-gray-400">filas</span>
               </div>
-
-
             </div>
           </div>
         )}
