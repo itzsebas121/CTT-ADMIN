@@ -23,8 +23,8 @@ export default function CardCourse({
   return (
     <div
       className={cn(
-        "rounded-2xl overflow-hidden shadow-lg bg-[#F2F1F8] flex flex-col h-full cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-105",
-        id ? "hover:bg-[#E8E7EF]" : ""
+        "rounded-2xl overflow-hidden shadow-lg bg-[var(--color-surface-card)] flex flex-col h-full cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-105",
+        id ? "hover:bg-[var(--color-surface-card-hover)]" : ""
       )}
       onClick={handleClick}
     >

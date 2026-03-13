@@ -70,7 +70,7 @@ export default function Stats() {
     AOS.refresh();
   }, []);
   return (
-    <div className="bg-[#F5F5F5] py-12 sm:py-14" data-aos="fade-down">
+    <div className="bg-[var(--color-surface-muted)] py-12 sm:py-14" data-aos="fade-down">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
           {stats.map((stat) => {

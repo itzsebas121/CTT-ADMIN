@@ -79,8 +79,8 @@ export default function CourseSection({ filters }) {
                             <button
                                 key={category.id}
                                 style={{
-                                    backgroundColor: activeCategory === category.text ? 'var(--color-primary)' : '#F5F5F5',
-                                    color: activeCategory === category.text ? 'white' : 'var(--color-primary)'
+                                    backgroundColor: activeCategory === category.text ? 'var(--color-primary)' : 'var(--color-surface-muted)',
+                                    color: activeCategory === category.text ? 'var(--color-white)' : 'var(--color-primary)'
                                 }}
                                 className="flex flex-col items-center justify-center text-center min-w-[150px] transition-all duration-200 hover:opacity-80"
                                 onClick={() => handleCategoryChange(category.text)}
