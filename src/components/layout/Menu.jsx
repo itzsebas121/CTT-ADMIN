@@ -106,7 +106,7 @@ export default function Menu() {
 
       {/* Menú lateral */}
       <aside className={`
-        w-72 bg-gradient-to-b from-[#6C1313] to-[#4a0c0c] text-white flex flex-col
+        w-72 bg-gradient-to-b from-[#3D5E94] to-[#3D5E94] text-white flex flex-col
         fixed lg:static inset-y-0 left-0 z-40 shadow-2xl
         transform transition-transform duration-300 ease-in-out border-r border-white/5
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
