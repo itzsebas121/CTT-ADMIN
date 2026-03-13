@@ -55,7 +55,7 @@ function App() {
           <Route path="cursos/:id/editar" element={<FormCourse />} />
           <Route path="cursos/:course_id/inscritos" element={<Inscritos />} />
           <Route path="estudiantes" element={<Estudiantes />} />
-          <Route path="categorias" element={<Categories />} />
+          <Route path="categoriasCursos" element={<Categories />} />
           <Route path="configuracion/home" element={<ConfiguracionHome />} />
           {/* Otras rutas privadas pueden ir aquí */}
         </Route>

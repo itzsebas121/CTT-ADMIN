@@ -20,8 +20,24 @@ export const dashboardMenuItems = [
     icon: "AcademicCapIcon",
     subItems: [
       { name: "Administrar Cursos", path: "/dashboard/cursos/", icon: "BookOpenIcon" },
-      { name: "Administrar Categorías", path: "/dashboard/categorias", icon: "TagIcon" },
-      { name: "Administrar Estudiantes", path: "/dashboard/estudiantes", icon: "UserGroupIcon" },
+      { name: "Administrar Categorías", path: "/dashboard/categoriasCursos", icon: "TagIcon" },
+    ]
+  },
+  {
+    name: "Congresos",
+    path: "/dashboard/congresos",
+    icon: "AcademicCapIcon",
+    subItems: [
+      { name: "Administrar Congresos", path: "/dashboard/congresos/", icon: "BookOpenIcon" },
+      { name: "Administrar Categorías", path: "/dashboard/categoriasCongresos", icon: "TagIcon" },
+    ]
+  },
+  {
+    name: "Estudiantes",
+    path: "/dashboard/estudiantes",
+    icon: "AcademicCapIcon",
+    subItems: [
+      { name: "Administrar Estudiantes", path: "/dashboard/estudiantes/", icon: "UserGroupIcon" },
     ]
   },
   {

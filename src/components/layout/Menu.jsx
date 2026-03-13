@@ -116,8 +116,7 @@ export default function Menu() {
           Panel Administrativo
         </div>
 
-        {/* Menú dinámico */}
-        {/* Menú dinámico */}
+
         <nav className="flex-1 space-y-4 overflow-y-auto">
           {dashboardMenuItems.map((item, index) => {
             const Icon = item.icon ? iconMap[item.icon] : null;
