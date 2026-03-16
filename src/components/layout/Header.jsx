@@ -16,7 +16,7 @@ export default function Header() {
                 <a href="#" className="-m-1.5 p-1.5">
                 <img
                     alt=""
-                    src="src/assets/logoUTA.webp"
+                    src="/logoUTA.webp"
                     className="h-22 w-auto"
                 />
                 </a>
@@ -30,7 +30,7 @@ export default function Header() {
                 <a href="#" className="-m-1.5 p-1.5">
                 <img
                     alt=""
-                    src="src/assets/logoCTT.webp"
+                    src="/logoCTT.webp"
                     className="h-22 w-auto "
                 />
                 </a>
@@ -39,7 +39,7 @@ export default function Header() {
                 <a href="#" className="-m-1.5 p-1.5">
                 <img
                     alt=""
-                    src="src/assets/logoUTAPequeño.png"
+                    src="/LogoUTAPequeño.png"
                     className="h-15 w-auto min-w-30"
                 />
                 </a>

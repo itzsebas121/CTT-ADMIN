@@ -13,7 +13,7 @@ const filters = {
 };
 const headers = ["id", "Nombre", "Estado", "Creado por", "acciones"];
 
-export default function Categories() {
+export default function CategoriasCursos() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

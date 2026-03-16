@@ -75,7 +75,7 @@ export default function Banner() {
         <div className="relative mt-16 h-80 lg:mt-32">
           <img
             alt="App screenshot"
-            src="src/assets/fisei.jpg"
+            src="/fisei.jpg"
             width={1824}
             height={1080}
             className="absolute top-0 left-0 w-228 max-w-none rounded-md bg-white/5 ring-1 ring-white/10"

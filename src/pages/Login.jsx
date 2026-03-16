@@ -59,7 +59,7 @@ export default function Login() {
       <div
         className="flex h-screen flex-col justify-center"
         style={{
-          backgroundImage: `url('src/assets/fisei.jpg')`,
+          backgroundImage: "url('/fisei.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -69,7 +69,7 @@ export default function Login() {
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <img
               alt="Your Company"
-              src="src/assets/logoCTT.webp"
+              src="/logoCTT.webp"
               className="mx-auto h-30 w-auto"
             />
             <h2 className="text-center text-2xl font-bold mt-1 tracking-tight text-primary">

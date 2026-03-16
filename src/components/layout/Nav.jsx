@@ -41,7 +41,7 @@ export default function Nav() {
           <a href="#" className="-m-1.5 p-1.5">
             <img
               alt="Logo CTT"
-              src="src/assets/logoCTT.webp"
+              src="/logoCTT.webp"
               className="h-16 w-auto object-contain"
             />
           </a>
@@ -50,7 +50,7 @@ export default function Nav() {
           <a href="#" className="-m-1.5 p-1.5">
             <img
               alt="Logo UTA"
-              src="src/assets/logoUTAPequeño.png"
+              src="/LogoUTAPequeño.png"
               className="h-12 w-auto object-contain"
             />
           </a>

@@ -3,7 +3,11 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Cursos from './pages/Cursos.jsx'
+import Congresos from './pages/Congresos.jsx'
 import CourseDetail from './pages/courses/CourseDetail.jsx'
+import CongresosDetalle from './pages/congress/CongresosDetalle.jsx'
+import FormularioCongreso from './pages/congress/FormularioCongreso.jsx'
+
 import FormCourse from './pages/courses/FormCourse.jsx'
 import Estudiantes from './pages/Estudiantes.jsx'
 import Inscritos from './pages/Inscritos.jsx'
@@ -11,7 +15,8 @@ import ConfiguracionHome from './pages/ConfiguracionHome.jsx'
 import { isAuthenticated } from './utils/auth'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import Categories from './pages/Categories.jsx'
+import CategoriasCursos from './pages/CategoriasCursos.jsx'
+import CategoriasCongresos from './pages/CategoriasCongresos.jsx'
 
 
 // Componente para proteger rutas (solo entra si hay token)
@@ -55,9 +60,13 @@ function App() {
           <Route path="cursos/:id/editar" element={<FormCourse />} />
           <Route path="cursos/:course_id/inscritos" element={<Inscritos />} />
           <Route path="estudiantes" element={<Estudiantes />} />
-          <Route path="categoriasCursos" element={<Categories />} />
+          <Route path="categoriasCursos" element={<CategoriasCursos />} />
           <Route path="configuracion/home" element={<ConfiguracionHome />} />
-          {/* Otras rutas privadas pueden ir aquí */}
+          {/* Ruta para el congreso */}
+          <Route path="congresos" element={<Congresos />} />
+          <Route path="categoriasCongresos" element={<CategoriasCongresos />} />
+          <Route path="congresos/:id" element={<CongresosDetalle />} />
+          <Route path="congresos/:id/editar" element={<FormularioCongreso />} />
         </Route>
         {/* Redirigir raíz al login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
