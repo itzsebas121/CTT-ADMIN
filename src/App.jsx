@@ -18,14 +18,12 @@ import 'react-toastify/dist/ReactToastify.css'
 import CategoriasCursos from './pages/CategoriasCursos.jsx'
 import CategoriasCongresos from './pages/CategoriasCongresos.jsx'
 
-
 // Componente para proteger rutas (solo entra si hay token)
 const PrivateRoute = ({ children }) => {
   return isAuthenticated() ? children : <Navigate to="/login" replace />;
 };
 
 function App() {
-
   return (
     <>
       <ToastContainer
@@ -52,7 +50,6 @@ function App() {
               <Dashboard />
             </PrivateRoute>
           }
-
         >
           <Route index element={<Navigate to="cursos" replace />} />
           <Route path="cursos" element={<Cursos />} />
@@ -62,9 +59,10 @@ function App() {
           <Route path="estudiantes" element={<Estudiantes />} />
           <Route path="categoriasCursos" element={<CategoriasCursos />} />
           <Route path="configuracion/home" element={<ConfiguracionHome />} />
-          {/* Ruta para el congreso */}
+          {/* Rutas para congresos */}
           <Route path="congresos" element={<Congresos />} />
           <Route path="categoriasCongresos" element={<CategoriasCongresos />} />
+          <Route path="congresos/crear" element={<FormularioCongreso />} />
           <Route path="congresos/:id" element={<CongresosDetalle />} />
           <Route path="congresos/:id/editar" element={<FormularioCongreso />} />
         </Route>

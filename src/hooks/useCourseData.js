@@ -25,8 +25,8 @@ export const useCourseData = (id, isEdit) => {
       start_time: '',
       end_time: '',
       location: '',
-      min_quota: 0,
-      max_quota: 0,
+      min_quota: '',
+      max_quota: '',
       in_person_hours: 0,
       autonomous_hours: 0,
       modality: 'Presencial',
@@ -57,7 +57,7 @@ export const useCourseData = (id, isEdit) => {
           course_data: {
             title: loadedCourse.title || '',
             description: loadedCourse.description || '',
-            category_id: loadedCourse.category_id || 'TICS',
+            category_id: loadedCourse.category_id || '',
             status: loadedCourse.status
               ? (String(loadedCourse.status).toLowerCase() === 'activo'
                   ? 'Activo'
@@ -82,11 +82,11 @@ export const useCourseData = (id, isEdit) => {
             start_time: loadedCourse.requirements?.courseSchedule?.startTime || '',
             end_time: loadedCourse.requirements?.courseSchedule?.endTime || '',
             location: loadedCourse.requirements?.location || '',
-            min_quota: loadedCourse.requirements?.quota?.min || 0,
-            max_quota: loadedCourse.requirements?.quota?.max || 0,
-            in_person_hours: loadedCourse.requirements?.hours?.inPerson || 0,
-            autonomous_hours: loadedCourse.requirements?.hours?.autonomous || 0,
-            modality: loadedCourse.requirements?.modality || '',
+            min_quota: loadedCourse.requirements?.quota?.min ?? loadedCourse.requirements?.min_quota ?? '',
+            max_quota: loadedCourse.requirements?.quota?.max ?? loadedCourse.requirements?.max_quota ?? '',
+            in_person_hours: loadedCourse.requirements?.hours?.inPerson ?? loadedCourse.requirements?.in_person_hours ?? 0,
+            autonomous_hours: loadedCourse.requirements?.hours?.autonomous ?? loadedCourse.requirements?.autonomous_hours ?? 0,
+            modality: loadedCourse.requirements?.modality || 'Presencial',
             certification: loadedCourse.requirements?.certification || '',
             prerequisites: loadedCourse.requirements?.prerequisites?.length > 0 ? loadedCourse.requirements.prerequisites : [''],
             prices: loadedCourse.requirements?.prices?.length > 0 ? loadedCourse.requirements.prices : [{ amount: 0, category: '' }]

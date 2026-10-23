@@ -1,16 +1,21 @@
-export default function StepImages({ banner, detail, onChangeImage }) {
+export default function StepImages({ banner, detail, onChangeImage, validationErrors = {} }) {
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-gray-900">Imágenes del curso</h2>
-      <p className="text-sm text-gray-600">
-        Suba la imagen de banner y la imagen de detalle. Formatos: JPG/PNG. Tamaño recomendado 1200x400 para banner.
-      </p>
+      <div>
+        <p className="text-sm font-semibold text-primary">La primera impresión</p>
+        <h2 className="text-2xl font-bold text-slate-900 mt-1">Elige las imágenes del curso</h2>
+        <p className="text-sm text-slate-500 mt-2">Usa una portada horizontal y una imagen de detalle que representen la experiencia.</p>
+      </div>
 
       {/* Banner Image */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Imagen de banner</label>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Imagen de banner <span className="text-red-500">*</span>
+        </label>
         <div className="flex flex-col sm:flex-row items-start gap-6">
-          <div className="w-full sm:w-64 h-auto sm:h-36 bg-gray-100 border border-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+          <div className={`w-full sm:w-64 h-auto sm:h-36 bg-slate-100 border rounded-2xl flex items-center justify-center overflow-hidden ${
+            validationErrors.course_image ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200'
+          }`}>
             {banner ? (
               <img src={banner} alt="Preview banner" className="w-full h-full object-cover" />
             ) : (
@@ -22,18 +27,25 @@ export default function StepImages({ banner, detail, onChangeImage }) {
               type="file"
               accept="image/*"
               onChange={(e) => onChangeImage('course_image', e.target.files?.[0])}
-              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover"
+              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
             />
-            <p className="mt-2 text-xs text-gray-500">Se mostrará como banner del curso.</p>
+            <p className="mt-2 text-xs text-gray-500">Se mostrará como banner del curso (relación 16:9 recomendada).</p>
+            {validationErrors.course_image && (
+              <p className="text-xs text-red-600 mt-1 font-medium">{validationErrors.course_image}</p>
+            )}
           </div>
         </div>
       </div>
 
       {/* Detail Image */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Imagen de detalle</label>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Imagen de detalle <span className="text-red-500">*</span>
+        </label>
         <div className="flex flex-col sm:flex-row items-start gap-6">
-          <div className="w-full sm:w-64 h-auto sm:h-80 bg-gray-100 border border-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+          <div className={`w-full sm:w-64 h-auto sm:h-80 bg-slate-100 border rounded-2xl flex items-center justify-center overflow-hidden ${
+            validationErrors.course_image_detail ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200'
+          }`}>
             {detail ? (
               <img src={detail} alt="Preview detalle" className="w-full h-full object-cover" />
             ) : (
@@ -45,9 +57,12 @@ export default function StepImages({ banner, detail, onChangeImage }) {
               type="file"
               accept="image/*"
               onChange={(e) => onChangeImage('course_image_detail', e.target.files?.[0])}
-              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover"
+              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
             />
-            <p className="mt-2 text-xs text-gray-500">Se mostrará en la vista detallada del curso.</p>
+            <p className="mt-2 text-xs text-gray-500">Se mostrará en la vista detallada del curso (formato vertical o cuadrado).</p>
+            {validationErrors.course_image_detail && (
+              <p className="text-xs text-red-600 mt-1 font-medium">{validationErrors.course_image_detail}</p>
+            )}
           </div>
         </div>
       </div>

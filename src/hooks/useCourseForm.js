@@ -23,6 +23,14 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
         [field]: value
       }
     }))
+    // Clear specific error if fixed
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const copy = { ...prev }
+        delete copy[field]
+        return copy
+      })
+    }
   }
 
   const handleCourseArrayChange = (field, index, value) => {
@@ -64,6 +72,13 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
         [field]: value
       }
     }))
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const copy = { ...prev }
+        delete copy[field]
+        return copy
+      })
+    }
   }
 
   const handleRequirementsArrayChange = (field, index, value) => {
@@ -101,11 +116,18 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
       ...prev,
       requirements_data: {
         ...prev.requirements_data,
-        prices: prev.requirements_data.prices.map((price, i) => 
+        prices: prev.requirements_data.prices.map((price, i) =>
           i === index ? { ...price, [field]: value } : price
         )
       }
     }))
+    if (validationErrors.prices) {
+      setValidationErrors(prev => {
+        const copy = { ...prev }
+        delete copy.prices
+        return copy
+      })
+    }
   }
 
   const addPrice = () => {
@@ -129,11 +151,11 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
   }
 
   // Contents handlers
-  const handleContentChange = (moduleIndex, field, value) => {
+  const handleContentChange = (index, field, value) => {
     setCourseData(prev => ({
       ...prev,
       contents_data: prev.contents_data.map((content, i) =>
-        i === moduleIndex ? { ...content, [field]: value } : content
+        i === index ? { ...content, [field]: value } : content
       )
     }))
   }
@@ -155,7 +177,14 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
   const addModule = () => {
     setCourseData(prev => ({
       ...prev,
-      contents_data: [...prev.contents_data, { unit: '', title: '', topics: [{ unit: '', title: '' }] }]
+      contents_data: [
+        ...prev.contents_data,
+        {
+          unit: `Módulo ${prev.contents_data.length + 1}`,
+          title: '',
+          topics: [{ unit: 'Tema 1', title: '' }]
+        }
+      ]
     }))
   }
 
@@ -172,7 +201,10 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
       contents_data: prev.contents_data.map((content, i) =>
         i === moduleIndex ? {
           ...content,
-          topics: [...content.topics, { unit: '', title: '' }]
+          topics: [
+            ...content.topics,
+            { unit: `Tema ${content.topics.length + 1}`, title: '' }
+          ]
         } : content
       )
     }))
@@ -200,199 +232,326 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
     handleCourseDataChange(field, tempUrl)
   }
 
-  const validateForm = () => {
+  /**
+   * Valida un paso específico del formulario.
+   * @param {number} stepNumber - 1, 2, 3 o 4
+   * @returns {boolean} true si el paso es válido
+   */
+  const validateStep = (stepNumber) => {
     const errors = {}
-    
-    // Validate General Data
-    if (!courseData.course_data.title?.trim()) {
-      errors.title = 'El título es requerido'
-    }
-    if (!courseData.course_data.description?.trim()) {
-      errors.description = 'La descripción es requerida'
-    }
-    if (!courseData.course_data.category_id) {
-      errors.category_id = 'La categoría es requerida'
-    }
-    if (!courseData.course_data.place?.trim()) {
-      errors.place = 'El lugar es requerido'
-    }
-    
-    // Validate arrays are not empty and don't have empty strings
-    const arrayFields = ['objectives', 'organizers', 'materials', 'target_audience']
-    arrayFields.forEach(field => {
-      const arr = courseData.course_data[field]
-      if (!arr || arr.length === 0 || arr.every(item => !item?.trim())) {
-        errors[field] = `Debe agregar al menos un ${field === 'objectives' ? 'objetivo' : field === 'organizers' ? 'organizador' : field === 'materials' ? 'material' : 'público objetivo'}`
+
+    // Paso 1: Datos Generales
+    if (stepNumber === 1) {
+      if (!courseData.course_data.title?.trim()) {
+        errors.title = 'El título del curso es requerido'
+      } else if (courseData.course_data.title.trim().length < 3) {
+        errors.title = 'El título debe tener al menos 3 caracteres'
       }
-    })
-    
-    // Validate Requirements Data
-    if (!courseData.requirements_data.start_date_registration) {
-      errors.start_date_registration = 'La fecha de inicio de inscripción es requerida'
+
+      if (!courseData.course_data.description?.trim()) {
+        errors.description = 'La descripción del curso es requerida'
+      }
+
+      if (!courseData.course_data.category_id) {
+        errors.category_id = 'Debes seleccionar una categoría'
+      }
+
+      if (!courseData.course_data.place?.trim()) {
+        errors.place = 'El lugar o campus es requerido'
+      }
+
+      const arrayFields = ['objectives', 'organizers', 'materials', 'target_audience']
+      arrayFields.forEach(field => {
+        const arr = courseData.course_data[field]
+        if (!arr || arr.length === 0 || arr.every(item => !item?.trim())) {
+          errors[field] = `Debe agregar al menos un ${
+            field === 'objectives' ? 'objetivo' :
+            field === 'organizers' ? 'organizador' :
+            field === 'materials' ? 'material' : 'público objetivo'
+          }`
+        }
+      })
     }
-    if (!courseData.requirements_data.end_date_registration) {
-      errors.end_date_registration = 'La fecha de fin de inscripción es requerida'
-    }
-    if (!courseData.requirements_data.start_date_course) {
-      errors.start_date_course = 'La fecha de inicio del curso es requerida'
-    }
-    if (!courseData.requirements_data.end_date_course) {
-      errors.end_date_course = 'La fecha de fin del curso es requerida'
-    }
-    if (!courseData.requirements_data.days || courseData.requirements_data.days.length === 0 || courseData.requirements_data.days.every(d => !d?.trim())) {
-      errors.days = 'Debe agregar al menos un día'
-    }
-    if (!courseData.requirements_data.start_time) {
-      errors.start_time = 'La hora de inicio es requerida'
-    }
-    if (!courseData.requirements_data.end_time) {
-      errors.end_time = 'La hora de fin es requerida'
-    }
-    if (!courseData.requirements_data.location?.trim()) {
-      errors.location = 'La ubicación es requerida'
-    }
-    if (!courseData.requirements_data.modality?.trim()) {
-      errors.modality = 'La modalidad es requerida'
-    }
-    if (!courseData.requirements_data.certification?.trim()) {
-      errors.certification = 'La certificación es requerida'
-    }
-    
-    // Validate quotas (must be > 1)
-    if (!courseData.requirements_data.min_quota || courseData.requirements_data.min_quota < 1) {
-      errors.min_quota = 'El cupo mínimo debe ser mayor a 1'
-    }
-    if (!courseData.requirements_data.max_quota || courseData.requirements_data.max_quota < 1) {
-      errors.max_quota = 'El cupo máximo debe ser mayor a 1'
-    }
-    if (courseData.requirements_data.min_quota > courseData.requirements_data.max_quota) {
-      errors.min_quota = 'El cupo mínimo no puede ser mayor al cupo máximo'
-    }
-    
-    // Validate prerequisites
-    if (!courseData.requirements_data.prerequisites || courseData.requirements_data.prerequisites.length === 0 || courseData.requirements_data.prerequisites.every(p => !p?.trim())) {
-      errors.prerequisites = 'Debe agregar al menos un prerequisito'
-    }
-    
-    // Validate prices
-    if (!courseData.requirements_data.prices || courseData.requirements_data.prices.length === 0) {
-      errors.prices = 'Debe agregar al menos un precio'
-    } else {
-      const invalidPrices = courseData.requirements_data.prices.some(p => !p.category?.trim())
-      if (invalidPrices) {
-        errors.prices = 'Todas las categorías de precio son requeridas'
+
+    // Paso 2: Requisitos y Cupos
+    if (stepNumber === 2) {
+      const req = courseData.requirements_data
+
+      if (!req.start_date_registration) {
+        errors.start_date_registration = 'La fecha de inicio de inscripción es requerida'
+      }
+      if (!req.end_date_registration) {
+        errors.end_date_registration = 'La fecha de fin de inscripción es requerida'
+      }
+      if (req.start_date_registration && req.end_date_registration) {
+        if (req.end_date_registration < req.start_date_registration) {
+          errors.end_date_registration = 'La fecha de fin de inscripción no puede ser anterior a la de inicio'
+        }
+      }
+
+      if (!req.start_date_course) {
+        errors.start_date_course = 'La fecha de inicio del curso es requerida'
+      }
+      if (!req.end_date_course) {
+        errors.end_date_course = 'La fecha de fin del curso es requerida'
+      }
+      if (req.start_date_course && req.end_date_course) {
+        if (req.end_date_course < req.start_date_course) {
+          errors.end_date_course = 'La fecha de fin del curso no puede ser anterior a la de inicio'
+        }
+      }
+
+      if (!req.days || req.days.length === 0 || req.days.every(d => !d?.trim())) {
+        errors.days = 'Debe seleccionar al menos un día de clase'
+      }
+      if (!req.start_time) {
+        errors.start_time = 'La hora de inicio es requerida'
+      }
+      if (!req.end_time) {
+        errors.end_time = 'La hora de fin es requerida'
+      }
+      if (req.start_time && req.end_time) {
+        if (req.end_time <= req.start_time) {
+          errors.end_time = 'La hora de fin debe ser posterior a la hora de inicio'
+        }
+      }
+
+      if (!req.location?.trim()) {
+        errors.location = 'La ubicación es requerida'
+      }
+      if (!req.modality?.trim()) {
+        errors.modality = 'La modalidad es requerida'
+      }
+      if (!req.certification?.trim()) {
+        errors.certification = 'La certificación es requerida'
+      }
+
+      // Validación numérica estricta de cupos
+      const minQuota = Number(req.min_quota)
+      const maxQuota = Number(req.max_quota)
+
+      const isMinInvalid = req.min_quota === '' || req.min_quota === null || req.min_quota === undefined || isNaN(minQuota) || minQuota < 1
+      const isMaxInvalid = req.max_quota === '' || req.max_quota === null || req.max_quota === undefined || isNaN(maxQuota) || maxQuota < 1
+
+      if (isMinInvalid) {
+        errors.min_quota = 'El cupo mínimo debe ser al menos 1'
+      }
+      if (isMaxInvalid) {
+        errors.max_quota = 'El cupo máximo debe ser al menos 1'
+      }
+
+      if (!isMinInvalid && !isMaxInvalid) {
+        if (minQuota > maxQuota) {
+          errors.min_quota = 'El cupo mínimo no puede ser mayor al cupo máximo'
+          errors.max_quota = 'El cupo máximo debe ser mayor o igual al cupo mínimo'
+        }
+      }
+
+      // Prerrequisitos
+      if (!req.prerequisites || req.prerequisites.length === 0 || req.prerequisites.every(p => !p?.trim())) {
+        errors.prerequisites = 'Debe agregar al menos un prerrequisito'
+      }
+
+      // Precios
+      if (!req.prices || req.prices.length === 0) {
+        errors.prices = 'Debe agregar al menos un precio'
+      } else {
+        const invalidPrices = req.prices.some(
+          p => !p.category?.trim() || isNaN(Number(p.amount)) || Number(p.amount) < 0
+        )
+        if (invalidPrices) {
+          errors.prices = 'Todos los precios deben tener categoría y un monto válido'
+        }
       }
     }
-    
-    // Validate Contents
-    if (!courseData.contents_data || courseData.contents_data.length === 0) {
-      errors.contents = 'Debe agregar al menos un módulo'
-    } else {
-      const hasInvalidModule = courseData.contents_data.some(module => 
-        !module.title?.trim() || 
-        !module.topics || module.topics.length === 0 ||
-        module.topics.some(topic => !topic.title?.trim())
-      )
-      if (hasInvalidModule) {
-        errors.contents = 'Todos los módulos deben tener título y al menos un tema completo'
+
+    // Paso 3: Contenido
+    if (stepNumber === 3) {
+      if (!courseData.contents_data || courseData.contents_data.length === 0) {
+        errors.contents = 'Debe agregar al menos un módulo'
+      } else {
+        const hasInvalidModule = courseData.contents_data.some(module =>
+          !module.title?.trim() ||
+          !module.topics || module.topics.length === 0 ||
+          module.topics.some(topic => !topic.title?.trim())
+        )
+        if (hasInvalidModule) {
+          errors.contents = 'Todos los módulos deben tener título y al menos un tema completo'
+        }
       }
     }
-    
-    // Validate Images
-    if (!courseData.course_data.course_image) {
-      errors.course_image = 'La imagen del banner es requerida'
+
+    // Paso 4: Imágenes
+    if (stepNumber === 4) {
+      if (!courseData.course_data.course_image && !pendingImages.course_image) {
+        errors.course_image = 'La imagen del banner es requerida'
+      }
+      if (!courseData.course_data.course_image_detail && !pendingImages.course_image_detail) {
+        errors.course_image_detail = 'La imagen de detalle es requerida'
+      }
     }
-    if (!courseData.course_data.course_image_detail) {
-      errors.course_image_detail = 'La imagen de detalle es requerida'
-    }
-    
+
     setValidationErrors(errors)
     return Object.keys(errors).length === 0
   }
 
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      setSubmitError('Por favor, complete todos los campos requeridos correctamente.')
-      toast.error('Por favor, complete todos los campos requeridos correctamente.', {
-        position: "top-right",
-        autoClose: 4000,
-      });
-      return
+  /**
+   * Valida todo el formulario y retorna si es válido y cuál es el primer paso con errores.
+   */
+  const validateForm = () => {
+    for (let s = 1; s <= 4; s++) {
+      if (!validateStep(s)) {
+        return { valid: false, failedStep: s }
+      }
     }
-    
+    setValidationErrors({})
+    return { valid: true, failedStep: null }
+  }
+
+  const handleSubmit = async () => {
+    const check = validateForm()
+    if (!check.valid) {
+      setSubmitError('Por favor, complete todos los campos requeridos correctamente.')
+      toast.warning(`Revisa los campos requeridos en el Paso ${check.failedStep}`)
+      return { success: false, failedStep: check.failedStep }
+    }
+
     setSaving(true)
     setSubmitError(null)
-    
+
     try {
       const imageUrls = { ...courseData.course_data }
-      
-      // Notificación de inicio de carga de imágenes
+
       if (pendingImages.course_image || pendingImages.course_image_detail) {
         toast.info('Subiendo imágenes...', {
           position: "top-right",
           autoClose: 2000,
-        });
+        })
       }
-      
+
       for (const field of ['course_image', 'course_image_detail']) {
         if (pendingImages[field]) {
           setImageUploading(true)
-          
+
           if (isEdit && originalImageUrls[field]) {
             try {
               await deleteImage(originalImageUrls[field])
-            } catch (deleteError) {
-              // Ignorar error de eliminación
+            } catch {
+              // Ignorar error al borrar imagen previa
             }
           }
-          
+
           const uploaded = await uploadImage(pendingImages[field])
           const newUrl = uploaded?.url || uploaded?.image_url || uploaded?.path
           if (!newUrl) throw new Error(`No se recibió una URL válida para ${field}`)
           imageUrls[field] = newUrl
         }
       }
-      
+
       setImageUploading(false)
-      
+
       const uiStatus = String(courseData.course_data.status || '').toLowerCase()
       const normalizedStatus = uiStatus === 'activo' ? 'activo' : uiStatus === 'cerrado' ? 'inactivo' : uiStatus
 
-      const dataToSend = {
-        course: {
-          ...imageUrls,
-          status: normalizedStatus
-        },
-        requirements: courseData.requirements_data,
-        contents: courseData.contents_data
+      const minQuota = parseInt(courseData.requirements_data.min_quota, 10)
+      const maxQuota = parseInt(courseData.requirements_data.max_quota, 10)
+      const inPersonHours = parseInt(courseData.requirements_data.in_person_hours, 10) || 0
+      const autonomousHours = parseInt(courseData.requirements_data.autonomous_hours, 10) || 0
+      const categoryId = parseInt(courseData.course_data.category_id, 10)
+
+      const formatTime = (timeStr) => {
+        if (!timeStr) return timeStr
+        const trimmed = timeStr.trim()
+        return trimmed.length === 5 ? `${trimmed}:00` : trimmed
       }
 
-      if (isEdit) {     
-        console.log('Updating course with data:', dataToSend)
-        await updateCourse(id, dataToSend)
-        toast.success('¡Curso actualizado exitosamente!', {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      } else {
-        console.log('Creating course with data:', dataToSend)
-        await createCourse(dataToSend)
-        toast.success('¡Curso creado exitosamente!', {
-          position: "top-right",
-          autoClose: 3000,
-        });
+      const cleanContents = (courseData.contents_data || []).map((m, idx) => ({
+        unit: m.unit?.trim() || `Módulo ${idx + 1}`,
+        title: m.title?.trim() || `Módulo ${idx + 1}`,
+        topics: (m.topics || []).map((t, tIdx) => ({
+          unit: t.unit?.trim() || `Tema ${tIdx + 1}`,
+          title: t.title?.trim() || `Tema ${tIdx + 1}`
+        }))
+      }))
+
+      const cleanPrices = (courseData.requirements_data.prices || []).map(p => ({
+        amount: Number(p.amount) || 0,
+        category: p.category?.trim() || 'General'
+      }))
+
+      const cleanPrerequisites = (courseData.requirements_data.prerequisites || [])
+        .map(p => (typeof p === 'string' ? p.trim() : ''))
+        .filter(Boolean)
+
+      const cleanObjectives = (courseData.course_data.objectives || [])
+        .map(p => (typeof p === 'string' ? p.trim() : ''))
+        .filter(Boolean)
+
+      const cleanOrganizers = (courseData.course_data.organizers || [])
+        .map(p => (typeof p === 'string' ? p.trim() : ''))
+        .filter(Boolean)
+
+      const cleanMaterials = (courseData.course_data.materials || [])
+        .map(p => (typeof p === 'string' ? p.trim() : ''))
+        .filter(Boolean)
+
+      const cleanTargetAudience = (courseData.course_data.target_audience || [])
+        .map(p => (typeof p === 'string' ? p.trim() : ''))
+        .filter(Boolean)
+
+      const dataToSend = {
+        course: {
+          title: courseData.course_data.title?.trim(),
+          description: courseData.course_data.description?.trim(),
+          place: courseData.course_data.place?.trim(),
+          course_image: imageUrls.course_image,
+          course_image_detail: imageUrls.course_image_detail,
+          category_id: categoryId,
+          status: normalizedStatus,
+          objectives: cleanObjectives,
+          organizers: cleanOrganizers,
+          materials: cleanMaterials,
+          target_audience: cleanTargetAudience
+        },
+        requirements: {
+          start_date_registration: courseData.requirements_data.start_date_registration,
+          end_date_registration: courseData.requirements_data.end_date_registration,
+          start_date_course: courseData.requirements_data.start_date_course,
+          end_date_course: courseData.requirements_data.end_date_course,
+          days: courseData.requirements_data.days || [],
+          start_time: formatTime(courseData.requirements_data.start_time),
+          end_time: formatTime(courseData.requirements_data.end_time),
+          location: courseData.requirements_data.location?.trim(),
+          min_quota: minQuota,
+          max_quota: maxQuota,
+          in_person_hours: inPersonHours,
+          autonomous_hours: autonomousHours,
+          modality: courseData.requirements_data.modality || 'Presencial',
+          certification: courseData.requirements_data.certification?.trim(),
+          prerequisites: cleanPrerequisites,
+          prices: cleanPrices
+        },
+        contents: cleanContents
       }
-      
+
+      if (isEdit) {
+        await updateCourse(id, dataToSend)
+        toast.success('¡Curso actualizado exitosamente!')
+      } else {
+        await createCourse(dataToSend)
+        toast.success('¡Curso creado exitosamente!')
+      }
+
       setTimeout(() => {
         navigate('/dashboard/cursos')
-      }, 1500);
+      }, 1200)
+
+      return { success: true }
     } catch (error) {
       const errorMessage = error.message || 'Error al guardar el curso. Por favor, intente nuevamente.'
       setSubmitError(errorMessage)
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 5000,
-      });
+      toast.error(errorMessage)
+      return { success: false, error: errorMessage }
     } finally {
       setSaving(false)
       setImageUploading(false)
@@ -404,6 +563,7 @@ export const useCourseForm = (courseData, setCourseData, isEdit, id, originalIma
     submitError,
     imageUploading,
     validationErrors,
+    validateStep,
     validateForm,
     handleCourseDataChange,
     handleCourseArrayChange,

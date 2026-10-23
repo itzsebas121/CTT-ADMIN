@@ -15,7 +15,7 @@ export default function StepNavigation({ currentStep, onStepChange }) {
                     : 'bg-gray-200 text-gray-600'
                 }`}
             >
-              {currentStep > i + 1 ? '✓' : i + 1}
+              {currentStep > i + 1 ? 'Completado' : i + 1}
             </button>
             <div className="ml-3 flex-1 min-w-0">
               <p className={`text-xs md:text-sm font-medium ${currentStep === i + 1 ? 'text-primary' : 'text-gray-600'}`}>

@@ -1,5 +1,21 @@
 import api from './api';
 
+const formatApiError = (error, defaultMsg = 'Error en la solicitud') => {
+    if (error.code === 'ECONNABORTED') {
+        return new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
+    }
+    if (error.response) {
+        const detail = error.response.data?.detail;
+        const msg = typeof detail === 'string'
+            ? detail
+            : Array.isArray(detail)
+            ? detail.map(d => d.msg || (d.loc ? `${d.loc.slice(-1)[0]}: ${d.msg}` : JSON.stringify(d))).join(', ')
+            : error.response.data?.message || defaultMsg;
+        return new Error(`Error ${error.response.status}: ${msg}`);
+    }
+    return new Error(`Error de red: ${error.message}`);
+};
+
 export const getCourses = async (page = 1, pageSize = 10, status = null) => {
     try {
         const params = {
@@ -7,7 +23,6 @@ export const getCourses = async (page = 1, pageSize = 10, status = null) => {
             page_size: pageSize
         };
         
-        // Solo agregar status si se proporciona
         if (status) {
             params.status = status;
         }
@@ -20,16 +35,9 @@ export const getCourses = async (page = 1, pageSize = 10, status = null) => {
         }
         return data;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al obtener cursos');
     }
 };
-
 
 export const getCoursesByCategory = async (category, page = 1, pageSize = 10, status = null) => {
     try {
@@ -38,7 +46,6 @@ export const getCoursesByCategory = async (category, page = 1, pageSize = 10, st
             page_size: pageSize
         };
         
-        // Solo agregar status si se proporciona
         if (status) {
             params.status = status;
         }
@@ -52,13 +59,7 @@ export const getCoursesByCategory = async (category, page = 1, pageSize = 10, st
 
         return data;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al obtener cursos por categoría');
     }
 };
 
@@ -66,27 +67,14 @@ export const getCourseById = async (courseId) => {
     try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/courses/${courseId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         return response.data;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al obtener detalle del curso');
     }
 };
 
-/**
- * Obtiene cursos filtrados por rango de horas
- * @param {number} minHours - Horas mínimas
- * @param {number} maxHours - Horas máximas
- * @returns {Promise<Course[]>} Lista de cursos filtrados por horas
- * @throws {Error} Si ocurre un error en la petición
- */
 export const getCoursesByHoursRange = async (minHours, maxHours) => {
     try {
         const response = await api.get(`/courses/hours-range/?min_hours=${minHours}&max_hours=${maxHours}`);
@@ -98,75 +86,34 @@ export const getCoursesByHoursRange = async (minHours, maxHours) => {
 
         return data.courses;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al filtrar cursos por horas');
     }
 };
 
-/**
- * Crea un nuevo curso
- * @param {Object} courseData - Datos del curso a crear
- * @returns {Promise<Object>} Curso creado
- * @throws {Error} Si ocurre un error en la petición
- */
 export const createCourse = async (courseData) => {
     try {
         const token = localStorage.getItem('token');
         const response = await api.post('/courses', courseData, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
-        console.log('Datos enviados:', courseData);
         return response.data;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al crear el curso');
     }
 };
 
-/**
- * Actualiza un curso existente
- * @param {string} courseId - ID del curso a actualizar
- * @param {Object} courseData - Datos del curso a actualizar
- * @returns {Promise<Object>} Curso actualizado
- * @throws {Error} Si ocurre un error en la petición
- */
 export const updateCourse = async (courseId, courseData) => {
     try {
         const token = localStorage.getItem('token');
         const response = await api.patch(`/courses/${courseId}`, courseData, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         return response.data;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al actualizar el curso');
     }
 };
 
-/**
- * Sube una imagen (multipart/form-data) y retorna la URL
- * @param {File} file
- * @returns {Promise<{url?: string, image_url?: string, path?: string}>}
- */
 export const uploadImage = async (file) => {
     try {
         const token = localStorage.getItem('token');
@@ -174,56 +121,28 @@ export const uploadImage = async (file) => {
         formData.append('file', file);
         const response = await api.post('/images/upload', formData, {
             headers: {
-                'Authorization': `Bearer ${token}`,
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
                 'Content-Type': 'multipart/form-data'
             }
         });
         return response.data;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al subir imagen');
     }
 };
 
-/**
- * Elimina una imagen existente enviando image_url en el body
- * @param {string} imageUrl
- * @returns {Promise<Object>}
- */
 export const deleteImage = async (imageUrl) => {
     try {
         const token = localStorage.getItem('token');
-        const response = await api.delete(`/images/delete?image_url=${imageUrl}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await api.delete(`/images/delete?image_url=${encodeURIComponent(imageUrl)}`, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         return response.data;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al eliminar imagen');
     }
 };
 
-/**
- * Busca cursos por título
- * @param {string} query - Término de búsqueda
- * @param {number} page - Número de página
- * @param {number} pageSize - Tamaño de página
- * @param {string|null} status - Estado del curso (opcional)
- * @returns {Promise<Object>} Resultados de la búsqueda
- * @throws {Error} Si ocurre un error en la petición
- */
 export const searchCourses = async (query, page = 1, pageSize = 10, status = null) => {
     try {
         const params = {
@@ -232,7 +151,6 @@ export const searchCourses = async (query, page = 1, pageSize = 10, status = nul
             page_size: pageSize
         };
         
-        // Solo agregar status si se proporciona
         if (status) {
             params.status = status;
         }
@@ -245,12 +163,6 @@ export const searchCourses = async (query, page = 1, pageSize = 10, status = nul
         }
         return data;
     } catch (error) {
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Tiempo de espera agotado. Verifica tu conexión a internet.');
-        }
-        if (error.response) {
-            throw new Error(`Error del servidor: ${error.response.status} - ${error.response.data?.message || 'Error desconocido'}`);
-        }
-        throw new Error(`Error de red: ${error.message}`);
+        throw formatApiError(error, 'Error al buscar cursos');
     }
 };
