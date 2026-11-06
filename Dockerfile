@@ -1,10 +1,15 @@
 FROM node:20 AS build
 
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm install
+
+# Inyección de variable de entorno para el bundle de producción de Vite
+ARG VITE_API_URL=http://localhost:6002/api/v1
+ENV VITE_API_URL=$VITE_API_URL
+
 COPY . .
-RUN echo "VITE_API_URL=http://172.21.123.81:8000/api/v1" > .env
 RUN npm run build
 
 FROM nginx:alpine
