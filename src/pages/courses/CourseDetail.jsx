@@ -23,10 +23,18 @@ export default function CourseDetail() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const courseId = parseInt(id, 10);
+    if (!id || id === "null" || id === "undefined" || isNaN(courseId) || courseId <= 0) {
+      setLoading(false);
+      setError("Identificador de curso inválido o no especificado.");
+      return;
+    }
+
     const loadCourse = async () => {
       try {
         setLoading(true);
-        const courseData = await getCourseById(id);
+        setError(null);
+        const courseData = await getCourseById(courseId);
         setCourse(courseData);
       } catch (err) {
         setError(err.message);
@@ -35,9 +43,7 @@ export default function CourseDetail() {
       }
     };
 
-    if (id) {
-      loadCourse();
-    }
+    loadCourse();
   }, [id]);
 
   const location = useLocation();
@@ -73,6 +79,7 @@ export default function CourseDetail() {
   }
 
   if (error) {
+    const isInvalidId = !id || id === "null" || id === "undefined" || isNaN(parseInt(id, 10)) || (typeof error === 'string' && (error.includes("422") || error.includes("inválido")));
     return (
       <div className="w-full max-w-xl mx-auto py-16 px-4 text-center">
         <div
@@ -84,19 +91,17 @@ export default function CourseDetail() {
             <ExclamationTriangleIcon className="w-6 h-6" />
           </div>
           <h2 className={`text-xl font-bold tracking-tight mb-2 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
-            Error al Cargar el Curso
+            {isInvalidId ? "Curso No Encontrado" : "Error al Cargar el Curso"}
           </h2>
           <p className={`text-xs sm:text-sm mb-6 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
-            {error}
+            {isInvalidId
+              ? "No se ha especificado un identificador de curso válido."
+              : error}
           </p>
           <button
             type="button"
             onClick={handleGoBack}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
-              isDark
-                ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-white/10'
-                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200'
-            }`}
+            className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#00345e] hover:bg-[#002747] text-white cursor-pointer transition-colors shadow-xs"
           >
             ← Volver a Cursos
           </button>

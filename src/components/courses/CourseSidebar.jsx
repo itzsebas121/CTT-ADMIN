@@ -97,7 +97,7 @@ export default function CourseSidebar({ course }) {
         <div className="space-y-2">
           <button
             type="button"
-            onClick={() => navigate(`/dashboard/cursos/${course.id}/editar`)}
+            onClick={() => course?.id && navigate(`/dashboard/cursos/${course.id}/editar`)}
             className={`w-full py-2.5 px-3.5 rounded-lg font-semibold text-xs text-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
               isDark
                 ? 'bg-[#00345e] hover:bg-[#004f8c] active:bg-[#002747] border border-blue-400/30'
@@ -111,6 +111,7 @@ export default function CourseSidebar({ course }) {
           <button
             type="button"
             onClick={() =>
+              course?.id &&
               navigate(`/dashboard/cursos/${course.id}/inscritos`, {
                 state: { courseName: course.title }
               })

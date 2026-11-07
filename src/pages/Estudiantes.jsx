@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { getUsers, searchUsers } from "../api/users";
 import { Table } from "../components/ui";
 import { TablePageLayout } from "../components/layout";
-import AOS from "aos";
-import "aos/dist/aos.css";
 
 const headers = [
   "id",
@@ -75,12 +73,6 @@ export default function Estudiantes() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    AOS.init({ duration: 1000, once: false, mirror: true });
-    AOS.refresh();
-    // loadUsers() removed to prevent double fetch since searchQuery effect triggers it
-  }, []);
 
   // Efecto para manejar la búsqueda con debounce
   useEffect(() => {

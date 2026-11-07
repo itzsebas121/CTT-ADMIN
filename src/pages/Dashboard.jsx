@@ -229,9 +229,5 @@ function DashboardInner() {
 }
 
 export default function Dashboard() {
-  return (
-    <DashboardThemeProvider>
-      <DashboardInner />
-    </DashboardThemeProvider>
-  );
+  return <DashboardInner />;
 }

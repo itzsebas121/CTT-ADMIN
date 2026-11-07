@@ -9,8 +9,6 @@ import { useNavigate } from "react-router-dom";
 import { Table } from "../components/ui";
 import { TablePageLayout } from "../components/layout";
 import { useDashboardTheme } from "../context/DashboardThemeContext";
-import AOS from "aos";
-import "aos/dist/aos.css";
 
 const headers = ["id", "titulo", "horas", "estado", "acciones"];
 
@@ -104,7 +102,7 @@ export default function Cursos() {
         <div className="flex items-center justify-end gap-2 whitespace-nowrap">
           <button
             type="button"
-            onClick={() => navigate(`/dashboard/cursos/${course.id}`)}
+            onClick={() => course?.id && navigate(`/dashboard/cursos/${course.id}`)}
             className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer border ${
               isDark
                 ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border-white/10'
@@ -117,7 +115,7 @@ export default function Cursos() {
           </button>
           <button
             type="button"
-            onClick={() => navigate(`/dashboard/cursos/${course.id}/editar`)}
+            onClick={() => course?.id && navigate(`/dashboard/cursos/${course.id}/editar`)}
             className={`h-8 px-3 text-xs font-medium rounded-lg transition-colors cursor-pointer border ${
               isDark
                 ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border-white/10'
@@ -130,6 +128,7 @@ export default function Cursos() {
           <button
             type="button"
             onClick={() =>
+              course?.id &&
               navigate(`/dashboard/cursos/${course.id}/inscritos`, {
                 state: { courseName: course.title }
               })
@@ -147,12 +146,6 @@ export default function Cursos() {
       ),
     }));
   }, [rawCourses, isDark, navigate]);
-
-  useEffect(() => {
-    AOS.init({ duration: 1000, once: false, mirror: true });
-    AOS.refresh();
-    // loadCourses() removed to prevent double fetch since searchQuery effect triggers it
-  }, []);
 
   // Efecto para manejar la búsqueda con debounce
   useEffect(() => {
