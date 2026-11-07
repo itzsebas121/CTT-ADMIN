@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDashboardTheme } from '../../context/DashboardThemeContext';
 
 /**
  * TablePageLayout - A reusable layout for pages that display a table.
@@ -10,27 +11,39 @@ import React from 'react';
  * @param {React.ReactNode} props.children - The main content (usually the Table component).
  */
 export default function TablePageLayout({ title, description, action, children }) {
-    return (
-        <div className="p-6 space-y-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h1>
-                    {description && (
-                        <p className="text-sm text-gray-500 mt-1">{description}</p>
-                    )}
-                </div>
-                {action && (
-                    <div className="flex-shrink-0">
-                        {action}
-                    </div>
-                )}
-            </div>
+  const { isDark } = useDashboardTheme();
 
-            {/* Main Content Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
-                {children}
-            </div>
+  return (
+    <div className="space-y-5">
+      {/* Header Section */}
+      <div
+        className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-xl border transition-colors ${
+          isDark
+            ? 'bg-[#16161a] border-white/[0.08] shadow-sm text-white'
+            : 'bg-white border-black/[0.08] shadow-xs text-zinc-900'
+        }`}
+      >
+        <div>
+          <h1 className={`text-xl sm:text-2xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-zinc-900'}`}>
+            {title}
+          </h1>
+          {description && (
+            <p className={`text-xs mt-1 font-normal leading-relaxed ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
+              {description}
+            </p>
+          )}
         </div>
-    );
+        {action && (
+          <div className="flex-shrink-0 self-start sm:self-auto">
+            {action}
+          </div>
+        )}
+      </div>
+
+      {/* Main Content Section */}
+      <div className="w-full">
+        {children}
+      </div>
+    </div>
+  );
 }

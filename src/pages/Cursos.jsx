@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   getCourses,
   getCoursesByCategory,
@@ -8,6 +8,7 @@ import { EyeIcon } from "@heroicons/react/16/solid";
 import { useNavigate } from "react-router-dom";
 import { Table } from "../components/ui";
 import { TablePageLayout } from "../components/layout";
+import { useDashboardTheme } from "../context/DashboardThemeContext";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -18,7 +19,7 @@ const filters = {
 };
 
 export default function Cursos() {
-  const [courses, setCourses] = useState([]);
+  const [rawCourses, setRawCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -28,6 +29,7 @@ export default function Cursos() {
   const [categorySelected, setCategorySelected] = useState(null);
   const [statusFilter, setStatusFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const { isDark } = useDashboardTheme();
   const navigate = useNavigate();
 
   const loadCourses = async (
@@ -62,7 +64,6 @@ export default function Cursos() {
               status,
             )
             : await getCourses(pageRequested, pageSizeRequested, status);
-        console.log('Courses response:', response);
       }
 
       // Manejar ambos formatos de respuesta
@@ -76,40 +77,7 @@ export default function Cursos() {
         response?.total_pages ??
         Math.max(1, Math.ceil(respTotal / respPageSize));
 
-      // Transformar los datos de la API para que coincidan con la estructura esperada por CardCourse
-      const transformedCourses = coursesArray.map((course) => ({
-        titulo: course.title,
-        estado: (() => {
-          const s = String(course.status || "").toLowerCase();
-          if (s === "activo") return "Activo";
-          if (s === "inactivo") return "Cerrado";
-          return s ? s[0].toUpperCase() + s.slice(1) : "";
-        })(),
-        horas: course.requirements?.hours?.total?.toString() || "0",
-        id: course.id,
-        acciones: (
-          <div className="flex gap-2">
-            <button onClick={() => navigate(`/dashboard/cursos/${course.id}`)}>
-              <EyeIcon className="h-5 w-5 inline-block" />
-            </button>
-            <button
-              onClick={() => navigate(`/dashboard/cursos/${course.id}/editar`)}
-            >
-              Editar
-            </button>
-            <button
-              onClick={() =>
-                navigate(`/dashboard/cursos/${course.id}/inscritos`, {
-                  state: { courseName: course.title }
-                })
-              }
-            >
-              Inscritos
-            </button>
-          </div>
-        ),
-      }));
-      setCourses(transformedCourses);
+      setRawCourses(coursesArray);
       setTotal(respTotal);
       setPage(pageRequested);
       setPageSize(respPageSize);
@@ -120,6 +88,65 @@ export default function Cursos() {
       setLoading(false);
     }
   };
+
+  const courses = useMemo(() => {
+    return rawCourses.map((course) => ({
+      titulo: course.title,
+      estado: (() => {
+        const s = String(course.status || "").toLowerCase();
+        if (s === "activo") return "Activo";
+        if (s === "inactivo") return "Cerrado";
+        return s ? s[0].toUpperCase() + s.slice(1) : "";
+      })(),
+      horas: course.requirements?.hours?.total?.toString() || "0",
+      id: course.id,
+      acciones: (
+        <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+          <button
+            type="button"
+            onClick={() => navigate(`/dashboard/cursos/${course.id}`)}
+            className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer border ${
+              isDark
+                ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border-white/10'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-900 border-zinc-200 shadow-xs'
+            }`}
+            title="Ver detalles"
+            aria-label="Ver detalles"
+          >
+            <EyeIcon className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(`/dashboard/cursos/${course.id}/editar`)}
+            className={`h-8 px-3 text-xs font-medium rounded-lg transition-colors cursor-pointer border ${
+              isDark
+                ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border-white/10'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-900 border-zinc-200 shadow-xs'
+            }`}
+            title="Editar curso"
+          >
+            Editar
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              navigate(`/dashboard/cursos/${course.id}/inscritos`, {
+                state: { courseName: course.title }
+              })
+            }
+            className={`h-8 px-3 text-xs font-semibold text-white rounded-lg transition-all shadow-xs cursor-pointer border-0 ${
+              isDark
+                ? 'bg-[#00345e] hover:bg-[#004f8c] active:bg-[#002747] border border-blue-400/30'
+                : 'bg-[#00345e] hover:bg-[#002747] active:bg-[#001f38]'
+            }`}
+            title="Ver estudiantes inscritos"
+          >
+            Inscritos
+          </button>
+        </div>
+      ),
+    }));
+  }, [rawCourses, isDark, navigate]);
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: false, mirror: true });
@@ -183,11 +210,12 @@ export default function Cursos() {
       description="Administra el catálogo de cursos disponibles"
       action={
         <button
+          type="button"
           onClick={() => navigate("/dashboard/cursos/crear/editar")}
-          className="inline-flex items-center justify-center px-4 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          className="h-9 px-3.5 bg-[#00345e] hover:bg-[#002747] active:bg-[#001f38] text-white text-xs font-semibold rounded-lg transition-all shadow-xs flex items-center gap-1.5 cursor-pointer border border-blue-400/30"
         >
-          <span className="mr-2 text-lg leading-none">+</span>
-          Crear Nuevo Curso
+          <span className="text-base leading-none font-bold">+</span>
+          <span>Crear Nuevo Curso</span>
         </button>
       }
     >

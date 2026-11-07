@@ -83,3 +83,27 @@ export const debounce = (func, wait = 300) => {
     timeout = setTimeout(later, wait);
   };
 };
+
+/**
+ * Normaliza la URL de una imagen para que se cargue correctamente
+ * desde el backend FastAPI o fuentes externas.
+ * @param {string} imageUrl - URL o ruta relativa de la imagen
+ * @returns {string} URL normalizada
+ */
+export const resolveImageUrl = (imageUrl) => {
+  if (!imageUrl || typeof imageUrl !== 'string') return '';
+
+  if (/^(https?:)?\/\//i.test(imageUrl) || imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) {
+    return imageUrl;
+  }
+
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (!apiUrl) return imageUrl;
+
+  try {
+    const apiOrigin = new URL(apiUrl).origin;
+    return `${apiOrigin}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+  } catch {
+    return imageUrl;
+  }
+};

@@ -1,5 +1,5 @@
 import { CpuChipIcon, BuildingLibraryIcon, CommandLineIcon, ComputerDesktopIcon, Squares2X2Icon, ArrowRightEndOnRectangleIcon, UsersIcon } from "@heroicons/react/24/outline"
-import CardCourse from "./CardCourse"
+import CardCourse from "../courses/CardCourse"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import AOS from "aos"
