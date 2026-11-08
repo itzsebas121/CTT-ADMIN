@@ -2,15 +2,20 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon,
+  ArrowRightIcon,
+  CheckIcon,
+  BookOpenIcon,
   PhotoIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  PlusIcon,
-  TrashIcon,
+  CalendarDaysIcon,
   BuildingOffice2Icon,
 } from "@heroicons/react/24/outline";
-import { StepNavigation } from "../../components/ui";
+import {
+  StepGeneralData,
+  StepDescriptionPoster,
+  StepSessions,
+  StepSponsors,
+  CreateSponsorModal,
+} from "../../components/congress";
 import {
   getCongressById,
   createCongress,
@@ -20,22 +25,23 @@ import {
   getSponsorsList,
 } from "../../api/congresses";
 import api from "../../api/api";
+import { useDashboardTheme } from "../../context/DashboardThemeContext";
 import { toast } from "react-toastify";
-import CreateSponsorModal from "../../components/congress/CreateSponsorModal";
 
 export default function FormularioCongreso() {
   const { id } = useParams();
   const isEdit = Boolean(id && id !== "crear");
   const navigate = useNavigate();
+  const { isDark } = useDashboardTheme();
 
-  const [currentStep, setCurrentStep] = useState(1);
+  const [step, setStep] = useState(1);
   const [loadingInitial, setLoadingInitial] = useState(isEdit);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
+  const [submitError, setSubmitError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
 
   // Modal para registrar una empresa patrocinadora en tiempo real
   const [isSponsorModalOpen, setIsSponsorModalOpen] = useState(false);
-  const [activeSponsorRowIndex, setActiveSponsorRowIndex] = useState(null);
 
   // Datos principales del congreso
   const [formData, setFormData] = useState({
@@ -46,23 +52,36 @@ export default function FormularioCongreso() {
     fecha_fin: "",
     descripcion_general: "",
     poster_cover_url: "",
+    lugar_sede: "Campus Huachi - Auditorio Central de la FISEI, Ambato",
   });
 
-  // Estado para el póster
+  // Ejes temáticos y público objetivo dinámicos (enriquecen la experiencia)
+  const [thematicTracks, setThematicTracks] = useState([
+    "Inteligencia Artificial y Modelos Multimodales",
+    "Ciberseguridad y Redes Avanzadas",
+    "Ingeniería de Software y Arquitecturas Cloud",
+  ]);
+
+  const [targetAudiences, setTargetAudiences] = useState([
+    "Docentes, investigadores y profesionales del sector tecnológico",
+    "Estudiantes de pregrado y posgrado en carreras afines a la computación",
+  ]);
+
+  // Estado para el afiche oficial
   const [posterFile, setPosterFile] = useState(null);
   const [posterPreview, setPosterPreview] = useState("");
   const [uploadingPoster, setUploadingPoster] = useState(false);
 
-  // Verificación de disponibilidad de edición y año
+  // Verificación de disponibilidad de edición y año en tiempo real
   const [editionCheck, setEditionCheck] = useState({
     checking: false,
     available: null,
     message: "",
   });
 
-  // Sesiones de cronograma (opcional)
+  // Sesiones de cronograma
   const [sessions, setSessions] = useState([]);
-  // Patrocinadores asociados (opcional)
+  // Patrocinadores asociados
   const [sponsors, setSponsors] = useState([]);
 
   // Catálogos reales del backend
@@ -71,12 +90,20 @@ export default function FormularioCongreso() {
   const [loadingCatalogs, setLoadingCatalogs] = useState(true);
 
   const steps = [
-    { name: "Datos Generales", description: "Identificación, edición y fechas" },
-    { name: "Descripción y Portada", description: "Póster y contenido general" },
-    { name: "Sesiones y Patrocinadores", description: "Cronograma y auspiciantes (opcional)" },
+    { name: "Datos Generales", description: "Identificación, fechas y sede" },
+    { name: "Descripción y Portada", description: "Resumen y afiche oficial" },
+    { name: "Cronograma", description: "Sesiones y conferencias" },
+    { name: "Patrocinadores", description: "Empresas y auspicios" },
   ];
 
-  // Cargar datos en modo edición
+  const stepMeta = [
+    { step: 1, label: "Información", sub: "Datos y fechas", icon: BookOpenIcon },
+    { step: 2, label: "Descripción", sub: "Alcance y afiche", icon: PhotoIcon },
+    { step: 3, label: "Cronograma", sub: "Sesiones y ponentes", icon: CalendarDaysIcon },
+    { step: 4, label: "Patrocinadores", sub: "Empresas y auspicios", icon: BuildingOffice2Icon },
+  ];
+
+  // 1. Cargar datos en modo edición
   useEffect(() => {
     if (isEdit) {
       const loadCongress = async () => {
@@ -92,6 +119,7 @@ export default function FormularioCongreso() {
             fecha_fin: c.fecha_fin || "",
             descripcion_general: c.descripcion_general || "",
             poster_cover_url: c.poster_cover_url || "",
+            lugar_sede: c.lugar_sede || "Campus Huachi - Auditorio Central de la FISEI, Ambato",
           });
           if (c.poster_cover_url) {
             setPosterPreview(c.poster_cover_url);
@@ -103,8 +131,8 @@ export default function FormularioCongreso() {
             setSponsors(data.sponsors);
           }
         } catch (err) {
-          setError(`Error al cargar congreso: ${err.message}`);
-          toast.error("No se pudo cargar el congreso.");
+          setSubmitError(`Error al cargar el congreso: ${err.message}`);
+          toast.error("No se pudo cargar la información del congreso.");
         } finally {
           setLoadingInitial(false);
         }
@@ -113,13 +141,13 @@ export default function FormularioCongreso() {
     }
   }, [id, isEdit]);
 
-  // Cargar catálogo de speakers y sponsors registrados
+  // 2. Cargar catálogos completos de ponentes y patrocinadores
   useEffect(() => {
     const fetchCatalogs = async () => {
       try {
         setLoadingCatalogs(true);
         const [spkRes, spoList] = await Promise.allSettled([
-          api.get("/speakers"),
+          api.get("/speakers", { params: { page_size: 100 } }),
           getSponsorsList(1, 100),
         ]);
 
@@ -131,7 +159,7 @@ export default function FormularioCongreso() {
           setAvailableSponsors(Array.isArray(spoList.value) ? spoList.value : []);
         }
       } catch (err) {
-        console.warn("Error cargando catálogos auxiliares:", err);
+        console.warn("Error cargando catálogos de ponentes y auspiciantes:", err);
       } finally {
         setLoadingCatalogs(false);
       }
@@ -139,7 +167,7 @@ export default function FormularioCongreso() {
     fetchCatalogs();
   }, []);
 
-  // Verificar disponibilidad de edición y año en tiempo real
+  // 3. Verificar disponibilidad de edición y año en tiempo real
   useEffect(() => {
     if (!formData.edicion || !formData.anio) {
       setEditionCheck({ checking: false, available: null, message: "" });
@@ -173,10 +201,23 @@ export default function FormularioCongreso() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "anio"
-        ? (value === "" ? "" : (Number.isNaN(Number.parseInt(value, 10) ) ? "" : Number.parseInt(value, 10)))
-        : value,
+      [name]:
+        name === "anio"
+          ? value === ""
+            ? ""
+            : Number.isNaN(Number.parseInt(value, 10))
+            ? ""
+            : Number.parseInt(value, 10)
+          : value,
     }));
+    // Limpiar error de campo al editar
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => {
+        const copy = { ...prev };
+        delete copy[name];
+        return copy;
+      });
+    }
   };
 
   const handlePosterChange = (e) => {
@@ -192,209 +233,68 @@ export default function FormularioCongreso() {
         setPosterPreview(event.target.result);
       };
       reader.readAsDataURL(file);
-    }
-  };
 
-  // Validaciones rigurosas por paso (conforme a reglas Pydantic, controller y PostgreSQL)
-  const validateStep = (step) => {
-    if (step === 1) {
-      const name = formData.nombre.trim();
-      if (!name || name.length < 3) {
-        toast.warning("El nombre del congreso debe tener al menos 3 caracteres.");
-        return false;
-      }
-      if (name.length > 100) {
-        toast.warning("El nombre del congreso no puede superar los 100 caracteres.");
-        return false;
-      }
-
-      const ed = formData.edicion.trim();
-      if (!ed) {
-        toast.warning("La edición del congreso es obligatoria.");
-        return false;
-      }
-      if (ed.length > 10) {
-        toast.warning("La edición del congreso no puede superar los 10 caracteres.");
-        return false;
-      }
-
-      const year = parseInt(formData.anio, 10);
-      if (isNaN(year) || year < 2000 || year > 2100) {
-        toast.warning("El año del congreso debe estar entre 2000 y 2100.");
-        return false;
-      }
-
-      if (!formData.fecha_inicio) {
-        toast.warning("La fecha de inicio es obligatoria.");
-        return false;
-      }
-      if (!formData.fecha_fin) {
-        toast.warning("La fecha de finalización es obligatoria.");
-        return false;
-      }
-      if (formData.fecha_fin <= formData.fecha_inicio) {
-        toast.warning("La fecha de finalización debe ser posterior a la fecha de inicio.");
-        return false;
-      }
-
-      if (editionCheck.available === false) {
-        toast.error("Ya existe un congreso con esta edición y año. Elige otra edición o año.");
-        return false;
-      }
-    }
-
-    if (step === 2) {
-      const desc = formData.descripcion_general.trim();
-      if (!desc || desc.length < 5) {
-        toast.warning("La descripción general es obligatoria (mínimo 5 caracteres).");
-        return false;
-      }
-
-      if (!posterFile && !formData.poster_cover_url.trim()) {
-        toast.warning("El póster o portada es obligatorio. Sube una imagen o ingresa una URL.");
-        return false;
-      }
-
-      if (formData.poster_cover_url && formData.poster_cover_url.trim().length > 300) {
-        toast.warning("La URL del póster no puede superar los 300 caracteres.");
-        return false;
-      }
-
-      if (!posterFile && formData.poster_cover_url.trim()) {
-        try {
-          const url = new URL(formData.poster_cover_url.trim());
-          if (!["http:", "https:"].includes(url.protocol) || !url.hostname.includes(".")) {
-            throw new Error();
-          }
-        } catch {
-          toast.warning("Ingresa una URL válida que comience con http:// o https://.");
-          return false;
-        }
-      }
-    }
-
-    if (step === 3) {
-      // 1. Validar Patrocinadores si se agregaron filas
-      if (sponsors.length > 0) {
-        const emptySponsor = sponsors.find((sp) => !sp.id_sponsor);
-        if (emptySponsor) {
-          toast.warning("Selecciona una empresa para cada patrocinador agregado, o elimina la fila.");
-          return false;
-        }
-
-        const sponsorIds = sponsors.map((sp) => Number(sp.id_sponsor));
-        if (new Set(sponsorIds).size !== sponsorIds.length) {
-          toast.warning("No puedes asignar la misma empresa patrocinadora más de una vez.");
-          return false;
-        }
-
-        const validCats = ["platino", "oro", "plata", "bronce", "colaborador"];
-        const invalidCat = sponsors.find(
-          (sp) => !validCats.includes(String(sp.categoria || "").toLowerCase().trim())
-        );
-        if (invalidCat) {
-          toast.warning("La categoría debe ser una de: platino, oro, plata, bronce, colaborador.");
-          return false;
-        }
-
-        const invalidAporte = sponsors.find((sp) => {
-          const a = Number(sp.aporte);
-          return isNaN(a) || a < 0 || a > 999999.99;
+      if (validationErrors.poster_cover_url) {
+        setValidationErrors((prev) => {
+          const copy = { ...prev };
+          delete copy.poster_cover_url;
+          return copy;
         });
-        if (invalidAporte) {
-          toast.warning("El aporte de cada patrocinador debe estar entre 0 y 999,999.99.");
-          return false;
-        }
       }
-
-      // 2. Validar Sesiones si se agregaron filas
-      if (sessions.length > 0) {
-        const missingSpeaker = sessions.find((s) => !s.id_speaker);
-        if (missingSpeaker) {
-          toast.warning("Debes seleccionar un ponente para cada sesión agregada, o elimina la fila.");
-          return false;
-        }
-
-        const invalidTitle = sessions.find(
-          (s) =>
-            !s.titulo_sesion ||
-            s.titulo_sesion.trim().length < 5 ||
-            s.titulo_sesion.trim().length > 200
-        );
-        if (invalidTitle) {
-          toast.warning("El título de cada sesión debe tener entre 5 y 200 caracteres.");
-          return false;
-        }
-
-        const invalidLugar = sessions.find(
-          (s) => !s.lugar || s.lugar.trim().length < 3 || s.lugar.trim().length > 150
-        );
-        if (invalidLugar) {
-          toast.warning("El lugar de cada sesión debe tener entre 3 y 150 caracteres.");
-          return false;
-        }
-
-        const invalidDate = sessions.find(
-          (s) => !s.fecha || s.fecha < formData.fecha_inicio || s.fecha > formData.fecha_fin
-        );
-        if (invalidDate) {
-          toast.warning(
-            `La fecha de cada sesión debe estar dentro del rango del congreso (${formData.fecha_inicio} al ${formData.fecha_fin}).`
-          );
-          return false;
-        }
-
-        const invalidTime = sessions.find(
-          (s) => !s.hora_inicio || !s.hora_fin || s.hora_fin <= s.hora_inicio
-        );
-        if (invalidTime) {
-          toast.warning("La hora de fin de cada sesión debe ser posterior a la hora de inicio.");
-          return false;
-        }
-
-        const validJornadas = ["mañana", "tarde", "noche"];
-        const invalidJornada = sessions.find(
-          (s) => !validJornadas.includes(String(s.jornada || "").toLowerCase().trim())
-        );
-        if (invalidJornada) {
-          toast.warning("La jornada debe ser una de: mañana, tarde, noche.");
-          return false;
-        }
-      }
-    }
-
-    return true;
-  };
-
-  const handleNextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
     }
   };
 
-  const handlePrevStep = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  // Manejo de Ejes Temáticos dinámicos
+  const handleAddTrack = () => {
+    setThematicTracks((prev) => [...prev, ""]);
+  };
+
+  const handleRemoveTrack = (index) => {
+    setThematicTracks((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleChangeTrack = (index, value) => {
+    setThematicTracks((prev) => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
+  };
+
+  // Manejo de Público Objetivo dinámico
+  const handleAddAudience = () => {
+    setTargetAudiences((prev) => [...prev, ""]);
+  };
+
+  const handleRemoveAudience = (index) => {
+    setTargetAudiences((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleChangeAudience = (index, value) => {
+    setTargetAudiences((prev) => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
   };
 
   // Manejo de Sesiones
   const handleAddSession = () => {
-    if (availableSpeakers.length === 0) {
-      toast.info(
-        "No hay ponentes registrados todavía en el catálogo. Podrás agendar sesiones tras registrar ponentes."
-      );
-      return;
-    }
+    const defaultSpeakerId =
+      availableSpeakers.length > 0
+        ? availableSpeakers[0].id_speaker || availableSpeakers[0].id
+        : "";
 
     setSessions((prev) => [
       ...prev,
       {
         titulo_sesion: "",
-        lugar: "Auditorio Principal",
+        lugar: formData.lugar_sede || "Auditorio Principal FISEI",
         fecha: formData.fecha_inicio || "",
         hora_inicio: "09:00",
         hora_fin: "10:30",
         jornada: "mañana",
-        id_speaker: availableSpeakers[0].id_speaker || availableSpeakers[0].id,
+        id_speaker: defaultSpeakerId,
       },
     ]);
   };
@@ -414,13 +314,11 @@ export default function FormularioCongreso() {
   // Manejo de Patrocinadores
   const handleAddSponsor = () => {
     if (availableSponsors.length === 0) {
-      // Si no hay empresas registradas en la base de datos, abrir modal de creación
-      setActiveSponsorRowIndex(null);
       setIsSponsorModalOpen(true);
       return;
     }
 
-    // Buscar una empresa que aún no haya sido asignada en la lista
+    // Buscar una empresa no asignada aún
     const unassigned = availableSponsors.find(
       (spo) =>
         !sponsors.some(
@@ -432,7 +330,6 @@ export default function FormularioCongreso() {
       toast.info(
         "Todas las empresas del catálogo ya están asociadas. Puedes registrar una nueva empresa para agregar otro patrocinador."
       );
-      setActiveSponsorRowIndex(null);
       setIsSponsorModalOpen(true);
       return;
     }
@@ -459,31 +356,150 @@ export default function FormularioCongreso() {
     setSponsors((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Callback ejecutado tras crear un patrocinador real en la base de datos
   const handleSponsorCreated = (newSponsor) => {
     const newId = newSponsor.id_sponsor || newSponsor.id;
     setAvailableSponsors((prev) => [newSponsor, ...prev]);
-
-    if (activeSponsorRowIndex !== null && sponsors[activeSponsorRowIndex]) {
-      handleSponsorChange(activeSponsorRowIndex, "id_sponsor", newId);
-    } else {
-      setSponsors((prev) => [
-        ...prev,
-        {
-          id_sponsor: newId,
-          categoria: "oro",
-          aporte: 1000,
-        },
-      ]);
-    }
-    setActiveSponsorRowIndex(null);
+    setSponsors((prev) => [
+      ...prev,
+      {
+        id_sponsor: newId,
+        categoria: "oro",
+        aporte: 1000,
+      },
+    ]);
   };
 
-  // Envío del formulario
+  // Validaciones rigurosas por paso (Pydantic / Postgres / Controller)
+  const validateStep = (s) => {
+    const errors = {};
+
+    if (s === 1) {
+      const name = formData.nombre?.trim();
+      if (!name || name.length < 3) {
+        errors.nombre = "El nombre del congreso debe tener al menos 3 caracteres.";
+      } else if (name.length > 100) {
+        errors.nombre = "El nombre del congreso no puede superar los 100 caracteres.";
+      }
+
+      const ed = formData.edicion?.trim();
+      if (!ed) {
+        errors.edicion = "La edición del congreso es obligatoria.";
+      } else if (ed.length > 10) {
+        errors.edicion = "La edición no puede superar los 10 caracteres.";
+      }
+
+      const year = parseInt(formData.anio, 10);
+      if (isNaN(year) || year < 2000 || year > 2100) {
+        errors.anio = "El año debe estar comprendido entre 2000 y 2100.";
+      }
+
+      if (!formData.fecha_inicio) {
+        errors.fecha_inicio = "La fecha de inicio es requerida.";
+      }
+      if (!formData.fecha_fin) {
+        errors.fecha_fin = "La fecha de finalización es requerida.";
+      }
+      if (formData.fecha_inicio && formData.fecha_fin && formData.fecha_fin < formData.fecha_inicio) {
+        errors.fecha_fin = "La fecha de fin no puede ser anterior a la fecha de inicio.";
+      }
+
+      if (editionCheck.available === false) {
+        errors.edicion = "Ya existe un congreso registrado con esta edición y año.";
+      }
+    }
+
+    if (s === 2) {
+      const desc = formData.descripcion_general?.trim();
+      if (!desc || desc.length < 5) {
+        errors.descripcion_general = "La descripción general es obligatoria (mínimo 5 caracteres).";
+      }
+
+      if (!posterFile && !formData.poster_cover_url?.trim()) {
+        errors.poster_cover_url = "Debes subir un afiche de portada o ingresar una URL válida.";
+      } else if (!posterFile && formData.poster_cover_url?.trim()) {
+        try {
+          const url = new URL(formData.poster_cover_url.trim());
+          if (!["http:", "https:"].includes(url.protocol) || !url.hostname.includes(".")) {
+            throw new Error();
+          }
+        } catch {
+          errors.poster_cover_url = "Ingresa una URL válida (http:// o https://).";
+        }
+      }
+    }
+
+    if (s === 3) {
+      if (sessions.length > 0) {
+        sessions.forEach((sess, idx) => {
+          if (!sess.id_speaker) {
+            errors[`session_${idx}`] = `Sesión #${idx + 1}: Selecciona un ponente asignado.`;
+          }
+          if (!sess.titulo_sesion || sess.titulo_sesion.trim().length < 5) {
+            errors[`session_${idx}`] = `Sesión #${idx + 1}: El título debe tener al menos 5 caracteres.`;
+          }
+          if (!sess.lugar || sess.lugar.trim().length < 3) {
+            errors[`session_${idx}`] = `Sesión #${idx + 1}: Especifica un lugar válido (mínimo 3 caracteres).`;
+          }
+          if (
+            sess.fecha &&
+            formData.fecha_inicio &&
+            formData.fecha_fin &&
+            (sess.fecha < formData.fecha_inicio || sess.fecha > formData.fecha_fin)
+          ) {
+            errors[`session_${idx}`] = `Sesión #${idx + 1}: La fecha debe estar dentro del congreso (${formData.fecha_inicio} al ${formData.fecha_fin}).`;
+          }
+          if (sess.hora_inicio && sess.hora_fin && sess.hora_fin <= sess.hora_inicio) {
+            errors[`session_${idx}`] = `Sesión #${idx + 1}: La hora de fin debe ser posterior a la de inicio.`;
+          }
+        });
+      }
+    }
+
+    if (s === 4) {
+      if (sponsors.length > 0) {
+        const sponsorIds = sponsors.map((sp) => Number(sp.id_sponsor));
+        if (new Set(sponsorIds).size !== sponsorIds.length) {
+          errors.sponsors = "No puedes vincular la misma empresa patrocinadora más de una vez.";
+        }
+        const emptySponsor = sponsors.find((sp) => !sp.id_sponsor);
+        if (emptySponsor) {
+          errors.sponsors = "Selecciona una empresa para cada patrocinador agregado o elimina la fila.";
+        }
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleNextStep = () => {
+    if (validateStep(step)) {
+      setStep(Math.min(4, step + 1));
+    } else {
+      toast.warning(`Por favor completa los campos requeridos en el Paso ${step} antes de continuar.`);
+    }
+  };
+
+  const handleStepClick = (number) => {
+    if (number <= step) {
+      setStep(number);
+    } else {
+      for (let s = step; s < number; s++) {
+        if (!validateStep(s)) {
+          toast.warning(`Completa los campos requeridos en el Paso ${s} antes de avanzar.`);
+          return;
+        }
+      }
+      setStep(number);
+    }
+  };
+
+  // Envío del Formulario
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
 
-    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) {
+      toast.warning("Por favor revisa los campos señalados antes de publicar.");
       return;
     }
 
@@ -493,14 +509,15 @@ export default function FormularioCongreso() {
     }
     if (editionCheck.available === false) {
       toast.error("Ya existe un congreso con esta edición y año.");
+      setStep(1);
       return;
     }
 
     setSaving(true);
-    setError(null);
+    setSubmitError(null);
 
     try {
-      let finalPosterUrl = formData.poster_cover_url.trim();
+      let finalPosterUrl = formData.poster_cover_url?.trim() || "";
 
       if (posterFile) {
         setUploadingPoster(true);
@@ -510,8 +527,9 @@ export default function FormularioCongreso() {
       }
 
       if (!finalPosterUrl) {
-        toast.warning("La imagen de portada es obligatoria.");
+        toast.warning("El afiche de portada es obligatorio.");
         setSaving(false);
+        setStep(2);
         return;
       }
 
@@ -527,24 +545,22 @@ export default function FormularioCongreso() {
 
       if (isEdit) {
         await updateCongress(id, { congress: congressPayload });
-        toast.success("Congreso actualizado exitosamente");
+        toast.success("¡Congreso actualizado exitosamente!");
       } else {
-        // Filtrar y estructurar sesiones
+        // Filtrar y formatear sesiones
         const validSessions = sessions
           .filter((s) => s.id_speaker && Number(s.id_speaker) > 0)
           .map((s) => ({
             fecha: s.fecha || formData.fecha_inicio,
-            hora_inicio:
-              s.hora_inicio.length === 5 ? `${s.hora_inicio}:00` : s.hora_inicio,
-            hora_fin:
-              s.hora_fin.length === 5 ? `${s.hora_fin}:00` : s.hora_fin,
+            hora_inicio: s.hora_inicio.length === 5 ? `${s.hora_inicio}:00` : s.hora_inicio,
+            hora_fin: s.hora_fin.length === 5 ? `${s.hora_fin}:00` : s.hora_fin,
             titulo_sesion: s.titulo_sesion.trim(),
             jornada: String(s.jornada || "mañana").toLowerCase().trim(),
-            lugar: s.lugar.trim(),
+            lugar: (s.lugar || formData.lugar_sede || "Auditorio FISEI").trim(),
             id_speaker: parseInt(s.id_speaker, 10),
           }));
 
-        // Filtrar y estructurar patrocinadores
+        // Filtrar y formatear patrocinadores
         const validSponsors = sponsors
           .filter((sp) => sp.id_sponsor && Number(sp.id_sponsor) > 0)
           .map((sp) => ({
@@ -558,7 +574,7 @@ export default function FormularioCongreso() {
           sponsors: validSponsors,
           sessions: validSessions,
         });
-        toast.success("¡Congreso creado con éxito!");
+        toast.success("¡Congreso publicado con éxito!");
       }
 
       navigate("/dashboard/congresos");
@@ -577,23 +593,10 @@ export default function FormularioCongreso() {
         const str = JSON.stringify(err.response?.data || "");
         if (str.includes("already exists")) {
           msg = "Ya existe un congreso registrado con esta edición y año.";
-        } else if (str.includes("Duplicate id_sponsor")) {
-          msg = "No puedes repetir un patrocinador en el mismo evento.";
-        } else if (str.includes("outside the congress date range")) {
-          msg = "La fecha de una sesión está fuera del rango de fechas del congreso.";
         }
-      } else if (err.response?.status === 404) {
-        const str = JSON.stringify(err.response?.data || "");
-        if (str.includes("Sponsor")) {
-          msg = "Uno de los patrocinadores seleccionados ya no existe en el catálogo.";
-        } else if (str.includes("Speaker")) {
-          msg = "Uno de los ponentes seleccionados ya no existe en el catálogo.";
-        }
-      } else if (err.response?.status === 500) {
-        msg = "Error 500 del servidor: Posible longitud excesiva de texto en base de datos. Verifica nombres, títulos y URLs.";
       }
 
-      setError(msg);
+      setSubmitError(msg);
       toast.error(msg);
     } finally {
       setSaving(false);
@@ -603,725 +606,264 @@ export default function FormularioCongreso() {
 
   if (loadingInitial) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-primary text-base font-medium">Cargando datos del congreso...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#00345e] border-t-transparent mx-auto mb-3" />
+          <p className="text-xs font-semibold text-[#00345e] dark:text-blue-400">
+            Cargando información del congreso...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Header superior */}
-        <div className="flex items-center justify-between bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/dashboard/congresos")}
-              className="p-2 text-gray-500 hover:text-primary hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
-              title="Volver a la lista"
-            >
-              <ArrowLeftIcon className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-                {isEdit ? "Editar Congreso" : "Crear Nuevo Congreso"}
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-500">
-                {isEdit
-                  ? `Modificando detalles del congreso #${id}`
-                  : "Completa los pasos para publicar un nuevo evento académico"}
-              </p>
-            </div>
-          </div>
+    <div className="w-full space-y-4">
+      {/* Encabezado Superior Compacto (Notion Style) */}
+      <div className="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <button
+            onClick={() => navigate("/dashboard/congresos")}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer shrink-0"
+          >
+            <ArrowLeftIcon className="h-3.5 w-3.5" />
+            <span>Congresos</span>
+          </button>
+          <span className="text-zinc-300 dark:text-zinc-600">/</span>
+          <h1 className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-white truncate">
+            {isEdit
+              ? `Editar: ${formData.nombre || "Congreso"}`
+              : "Crear Nuevo Congreso"}
+          </h1>
         </div>
 
-        {/* Stepper de navegación */}
-        <StepNavigation
-          currentStep={currentStep}
-          onStepChange={(stepNum) => {
-            if (stepNum < currentStep || validateStep(currentStep)) {
-              setCurrentStep(stepNum);
-            }
-          }}
-          steps={steps}
-        />
+        <span className="text-[11px] text-zinc-400 dark:text-zinc-500 hidden sm:inline shrink-0">
+          Los cambios se guardan al publicar
+        </span>
+      </div>
 
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm flex items-start gap-2">
-            <ExclamationTriangleIcon className="w-5 h-5 shrink-0 text-red-500 mt-0.5" />
-            <div>
-              <p className="font-semibold">Error al guardar:</p>
-              <p>{error}</p>
-            </div>
-          </div>
-        )}
+      {/* Stepper / Mostradores Intuitivo (Notion Style) */}
+      <div className="rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#16161a] p-2 shadow-2xs">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5">
+          {stepMeta.map((item) => {
+            const number = item.step;
+            const isActive = number === step;
+            const isDone = number < step;
 
-        {/* Contenedor del paso activo */}
-        <div className="bg-white rounded-2xl shadow-xs border border-gray-100 p-6 sm:p-8">
-          {/* PASO 1: Datos Generales */}
-          {currentStep === 1 && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-bold text-gray-900 pb-3 border-b border-gray-100">
-                1. Información Básica del Evento
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Nombre */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex justify-between">
-                    <span>
-                      Nombre del Congreso <span className="text-red-500">*</span>
-                    </span>
-                    <span className="text-xs text-gray-400 font-normal">
-                      ({formData.nombre.length}/100)
-                    </span>
-                  </label>
-                  <input
-                    type="text"
-                    name="nombre"
-                    maxLength={100}
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    placeholder="Ej: Congreso Internacional de Tecnologías de la Información"
-                    required
-                    minLength={3}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
-                  />
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => handleStepClick(number)}
+                className={`flex items-center gap-2.5 p-2 sm:p-2.5 rounded-lg text-left transition-all cursor-pointer border ${
+                  isActive
+                    ? "bg-[#e6f3fe] dark:bg-[#00345e]/25 border-[#00345e]/30 dark:border-blue-500/40 text-[#00345e] dark:text-blue-200"
+                    : isDone
+                    ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500/20 text-zinc-800 dark:text-zinc-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                    : "bg-transparent border-transparent text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100/70 dark:hover:bg-white/[0.04]"
+                }`}
+              >
+                <div
+                  className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold transition-colors ${
+                    isActive
+                      ? "bg-[#00345e] text-white shadow-xs"
+                      : isDone
+                      ? "bg-emerald-500 text-white"
+                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-black/[0.06] dark:border-white/[0.06]"
+                  }`}
+                >
+                  {isDone ? (
+                    <CheckIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+                  ) : (
+                    number
+                  )}
                 </div>
-
-                {/* Edición */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex justify-between">
-                    <span>
-                      Edición <span className="text-red-500">*</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <span
+                      className={`text-xs font-semibold truncate ${
+                        isActive
+                          ? "text-[#00345e] dark:text-blue-200"
+                          : isDone
+                          ? "text-zinc-900 dark:text-white"
+                          : "text-zinc-600 dark:text-zinc-300"
+                      }`}
+                    >
+                      {item.label}
                     </span>
-                    <span className="text-xs text-gray-400 font-normal">
-                      ({formData.edicion.length}/10)
-                    </span>
-                  </label>
-                  <input
-                    type="text"
-                    name="edicion"
-                    maxLength={10}
-                    value={formData.edicion}
-                    onChange={handleChange}
-                    placeholder="Ej: I, II, 3ra, 2026"
-                    required
-                    minLength={1}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
-                  />
-                  {editionCheck.checking ? (
-                    <p className="text-xs text-gray-400 mt-1">Verificando disponibilidad...</p>
-                  ) : editionCheck.available === true ? (
-                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <CheckCircleIcon className="w-4 h-4 inline" /> {editionCheck.message}
-                    </p>
-                  ) : editionCheck.available === false ? (
-                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                      <ExclamationTriangleIcon className="w-4 h-4 inline" /> {editionCheck.message}
-                    </p>
-                  ) : null}
-                </div>
-
-                {/* Año */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex justify-between">
-                    <span>
-                      Año <span className="text-red-500">*</span>
-                    </span>
-                    <span className="text-xs text-gray-400 font-normal">(2000 - 2100)</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="anio"
-                    min="2000"
-                    max="2100"
-                    value={formData.anio}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
-                  />
-                </div>
-
-                {/* Fecha Inicio */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Fecha de Inicio <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="fecha_inicio"
-                    value={formData.fecha_inicio}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
-                  />
-                </div>
-
-                {/* Fecha Fin */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Fecha de Finalización <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="fecha_fin"
-                    min={formData.fecha_inicio || undefined}
-                    value={formData.fecha_fin}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">
-                    Debe ser posterior a la fecha de inicio.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* PASO 2: Descripción y Portada */}
-          {currentStep === 2 && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-bold text-gray-900 pb-3 border-b border-gray-100">
-                2. Descripción y Recursos Gráficos
-              </h2>
-
-              {/* Descripción general */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex justify-between">
-                  <span>
-                    Descripción General <span className="text-red-500">*</span>
-                  </span>
-                  <span className="text-xs text-gray-400 font-normal">
-                    ({formData.descripcion_general.length}/2000)
-                  </span>
-                </label>
-                <textarea
-                  name="descripcion_general"
-                  maxLength={2000}
-                  rows={6}
-                  value={formData.descripcion_general}
-                  onChange={handleChange}
-                  placeholder="Detalla la temática del congreso, sus objetivos, público objetivo, líneas de investigación..."
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all resize-y"
-                />
-              </div>
-
-              {/* Póster / Portada */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Póster / Portada del Congreso <span className="text-red-500">*</span>
-                </label>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mt-2">
-                  {/* Vista previa */}
-                  <div className="aspect-[4/3] rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 overflow-hidden flex flex-col items-center justify-center p-4 relative group">
-                    {posterPreview ? (
-                      <>
-                        <img
-                          src={posterPreview}
-                          alt="Póster del congreso"
-                          className="w-full h-full object-cover rounded-xl"
-                          onError={() => setPosterPreview("")}
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
-                          <label
-                            htmlFor="poster-upload"
-                            className="px-3.5 py-1.5 bg-white text-gray-800 text-xs font-semibold rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 transition-colors"
-                          >
-                            Cambiar imagen
-                          </label>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-center text-gray-400">
-                        <PhotoIcon className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                        <p className="text-sm font-medium">Ninguna imagen seleccionada</p>
-                        <p className="text-xs text-gray-400 mt-0.5">Sube un archivo o ingresa una URL</p>
-                      </div>
+                    {isActive && (
+                      <span className="text-[10px] font-medium px-1.5 py-0.2 bg-[#00345e]/10 dark:bg-blue-400/20 text-[#00345e] dark:text-blue-300 rounded shrink-0 hidden md:inline">
+                        Paso {number}
+                      </span>
                     )}
                   </div>
-
-                  {/* Selector y URL */}
-                  <div className="space-y-4">
-                    <div>
-                      <span className="block text-xs font-semibold text-gray-600 mb-1">
-                        Subir archivo local:
-                      </span>
-                      <input
-                        id="poster-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePosterChange}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
-                      />
-                      <p className="text-xs text-gray-400 mt-1">
-                        Formatos soportados: JPG, PNG, WEBP. Máx. 5MB.
-                      </p>
-                    </div>
-
-                    <div className="pt-2 border-t border-gray-100">
-                      <label className="block text-xs font-semibold text-gray-600 mb-1 flex justify-between">
-                        <span>O ingresa URL directa de la imagen:</span>
-                        <span className="text-gray-400 font-normal">
-                          ({formData.poster_cover_url.length}/300)
-                        </span>
-                      </label>
-                      <input
-                        type="url"
-                        name="poster_cover_url"
-                        maxLength={300}
-                        value={formData.poster_cover_url}
-                        onChange={(e) => {
-                          handleChange(e);
-                          if (!posterFile) setPosterPreview(e.target.value);
-                        }}
-                        placeholder="https://ejemplo.com/poster.jpg"
-                        className="w-full px-3.5 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* PASO 3: Sesiones y Patrocinadores */}
-          {currentStep === 3 && (
-            <div className="space-y-8">
-              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900">
-                    3. Sesiones de Cronograma y Patrocinadores (Opcional)
-                  </h2>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Este paso es 100% opcional. Si no deseas asignar sesiones ni empresas auspiciantes ahora, puedes omitirlo y hacer clic en <strong>"Crear Congreso"</strong>.
+                  <p className="text-[11px] text-zinc-400 dark:text-zinc-500 truncate hidden sm:block">
+                    {item.sub}
                   </p>
                 </div>
-              </div>
-
-              {/* SECCIÓN PATROCINADORES */}
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-800">
-                      Patrocinadores (Auspiciantes)
-                    </h3>
-                    <p className="text-xs text-gray-500">
-                      Empresas u organizaciones reales que colaboran con el evento.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveSponsorRowIndex(null);
-                        setIsSponsorModalOpen(true);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-                    >
-                      <BuildingOffice2Icon className="w-4 h-4" /> Registrar Nueva Empresa
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleAddSponsor}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-primary-hover text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-                    >
-                      <PlusIcon className="w-4 h-4" /> + Asignar Patrocinador
-                    </button>
-                  </div>
-                </div>
-
-                {availableSponsors.length === 0 ? (
-                  <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-xl text-xs text-blue-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-start gap-2.5">
-                      <InformationCircleIcon className="w-5 h-5 shrink-0 text-blue-600 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-blue-900">Catálogo de empresas vacío</p>
-                        <p className="text-blue-700 mt-0.5">
-                          Para vincular un auspiciante debe existir previamente en el catálogo oficial de empresas. Puedes registrar una ahora mismo o crear el congreso directamente sin patrocinadores.
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveSponsorRowIndex(null);
-                        setIsSponsorModalOpen(true);
-                      }}
-                      className="px-3.5 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors shrink-0 cursor-pointer text-center"
-                    >
-                      + Registrar Empresa Ahora
-                    </button>
-                  </div>
-                ) : sponsors.length === 0 ? (
-                  <div className="p-6 bg-gray-50 rounded-xl text-center text-gray-400 text-sm border border-dashed border-gray-200">
-                    No has asignado patrocinadores aún (opcional). Haz clic en <strong>"+ Asignar Patrocinador"</strong> para vincular una empresa.
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {sponsors.map((sp, idx) => (
-                      <div
-                        key={idx}
-                        className="p-4 bg-gray-50 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-12 gap-3 items-end"
-                      >
-                        {/* Selector de Empresa */}
-                        <div className="md:col-span-5">
-                          <label className="block text-xs font-medium text-gray-700 mb-1 flex items-center justify-between">
-                            <span>Empresa Patrocinadora <span className="text-red-500">*</span></span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setActiveSponsorRowIndex(idx);
-                                setIsSponsorModalOpen(true);
-                              }}
-                              className="text-primary hover:underline text-[11px] font-semibold cursor-pointer"
-                            >
-                              + Nueva Empresa
-                            </button>
-                          </label>
-                          <select
-                            value={sp.id_sponsor || ""}
-                            onChange={(e) =>
-                              handleSponsorChange(
-                                idx,
-                                "id_sponsor",
-                                e.target.value ? parseInt(e.target.value, 10) : ""
-                              )
-                            }
-                            required
-                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                          >
-                            <option value="">-- Selecciona una empresa del catálogo --</option>
-                            {availableSponsors.map((spo) => {
-                              const spoId = spo.id_sponsor || spo.id;
-                              const isTaken = sponsors.some(
-                                (s, sIdx) => sIdx !== idx && Number(s.id_sponsor) === Number(spoId)
-                              );
-                              return (
-                                <option key={spoId} value={spoId} disabled={isTaken}>
-                                  {spo.nombre} {isTaken ? "(Ya seleccionada)" : ""}
-                                </option>
-                              );
-                            })}
-                          </select>
-                        </div>
-
-                        {/* Categoría Patrocinio */}
-                        <div className="md:col-span-3">
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Categoría Patrocinio
-                          </label>
-                          <select
-                            value={sp.categoria || "oro"}
-                            onChange={(e) =>
-                              handleSponsorChange(idx, "categoria", e.target.value)
-                            }
-                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                          >
-                            <option value="platino">Platino</option>
-                            <option value="oro">Oro</option>
-                            <option value="plata">Plata</option>
-                            <option value="bronce">Bronce</option>
-                            <option value="colaborador">Colaborador</option>
-                          </select>
-                        </div>
-
-                        {/* Aporte ($) */}
-                        <div className="md:col-span-3">
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Aporte ($) (0 - 999,999.99)
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            max="999999.99"
-                            step="0.01"
-                            required
-                            value={sp.aporte}
-                            onChange={(e) =>
-                              handleSponsorChange(idx, "aporte", e.target.value)
-                            }
-                            placeholder="Ej: 1000.00"
-                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                          />
-                        </div>
-
-                        {/* Botón Eliminar */}
-                        <div className="md:col-span-1 flex items-center justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveSponsor(idx)}
-                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Eliminar patrocinador"
-                          >
-                            <TrashIcon className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* SECCIÓN CRONOGRAMA */}
-              <div className="space-y-4 pt-6 border-t border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-800">
-                      Sesiones del Cronograma
-                    </h3>
-                    <p className="text-xs text-gray-500">
-                      Ponencias y conferencias que formarán parte de la agenda.
-                    </p>
-                  </div>
-                  {availableSpeakers.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={handleAddSession}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-                    >
-                      <PlusIcon className="w-4 h-4" /> Agregar Sesión
-                    </button>
-                  )}
-                </div>
-
-                {availableSpeakers.length === 0 ? (
-                  <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600 flex items-start gap-2.5">
-                    <InformationCircleIcon className="w-5 h-5 shrink-0 text-gray-400 mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-gray-800">Catálogo de Ponentes vacío para sesiones iniciales</p>
-                      <p className="text-gray-500 mt-0.5">
-                        En el sistema, los ponentes se registran vinculados al congreso. Puedes crear el congreso ahora (las sesiones son opcionales) y posteriormente agregar los ponentes y su cronograma desde el detalle del congreso.
-                      </p>
-                    </div>
-                  </div>
-                ) : sessions.length === 0 ? (
-                  <div className="p-6 bg-gray-50 rounded-xl text-center text-gray-400 text-sm border border-dashed border-gray-200">
-                    No has agregado sesiones aún (opcional). Haz clic en <strong>"Agregar Sesión"</strong> si deseas incluir ponencias iniciales.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {sessions.map((sess, idx) => (
-                      <div
-                        key={idx}
-                        className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3 relative"
-                      >
-                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
-                          <span className="text-xs font-bold text-gray-700">
-                            Sesión #{idx + 1}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveSession(idx)}
-                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Eliminar sesión"
-                          >
-                            <TrashIcon className="w-4 h-4" />
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
-                          {/* Título de la sesión */}
-                          <div className="md:col-span-5">
-                            <label className="block text-xs font-medium text-gray-600 mb-1 flex justify-between">
-                              <span>Título de la Sesión <span className="text-red-500">*</span></span>
-                              <span className="text-gray-400 font-normal">
-                                ({sess.titulo_sesion?.length || 0}/200)
-                              </span>
-                            </label>
-                            <input
-                              type="text"
-                              value={sess.titulo_sesion}
-                              onChange={(e) =>
-                                handleSessionChange(idx, "titulo_sesion", e.target.value)
-                              }
-                              placeholder="Ej: Keynote: Inteligencia Artificial en la Educación"
-                              minLength={5}
-                              maxLength={200}
-                              required
-                              className="w-full px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs"
-                            />
-                          </div>
-
-                          {/* Lugar / Auditorio */}
-                          <div className="md:col-span-4">
-                            <label className="block text-xs font-medium text-gray-600 mb-1 flex justify-between">
-                              <span>Lugar / Auditorio <span className="text-red-500">*</span></span>
-                              <span className="text-gray-400 font-normal">
-                                ({sess.lugar?.length || 0}/150)
-                              </span>
-                            </label>
-                            <input
-                              type="text"
-                              value={sess.lugar}
-                              onChange={(e) =>
-                                handleSessionChange(idx, "lugar", e.target.value)
-                              }
-                              placeholder="Ej: Auditorio Principal, Sala Magna"
-                              minLength={3}
-                              maxLength={150}
-                              required
-                              className="w-full px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs"
-                            />
-                          </div>
-
-                          {/* Ponente */}
-                          <div className="md:col-span-3">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Ponente <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                              value={sess.id_speaker || ""}
-                              onChange={(e) =>
-                                handleSessionChange(
-                                  idx,
-                                  "id_speaker",
-                                  e.target.value ? parseInt(e.target.value, 10) : ""
-                                )
-                              }
-                              required
-                              className="w-full px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-xs"
-                            >
-                              <option value="">Selecciona ponente...</option>
-                              {availableSpeakers.map((spk) => (
-                                <option
-                                  key={spk.id_speaker || spk.id}
-                                  value={spk.id_speaker || spk.id}
-                                >
-                                  {spk.nombres_completos || spk.nombre || `Ponente #${spk.id_speaker || spk.id}`}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          {/* Fecha */}
-                          <div className="md:col-span-4">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Fecha de Sesión <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              type="date"
-                              required
-                              min={formData.fecha_inicio || undefined}
-                              max={formData.fecha_fin || undefined}
-                              value={sess.fecha}
-                              onChange={(e) =>
-                                handleSessionChange(idx, "fecha", e.target.value)
-                              }
-                              className="w-full px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs"
-                            />
-                          </div>
-
-                          {/* Horario */}
-                          <div className="md:col-span-4">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Horario (Inicio - Fin) <span className="text-red-500">*</span>
-                            </label>
-                            <div className="flex items-center gap-1">
-                              <input
-                                type="time"
-                                required
-                                value={sess.hora_inicio?.substring(0, 5)}
-                                onChange={(e) =>
-                                  handleSessionChange(idx, "hora_inicio", e.target.value)
-                                }
-                                className="w-full px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-xs"
-                              />
-                              <span className="text-gray-400 text-xs">-</span>
-                              <input
-                                type="time"
-                                required
-                                value={sess.hora_fin?.substring(0, 5)}
-                                onChange={(e) =>
-                                  handleSessionChange(idx, "hora_fin", e.target.value)
-                                }
-                                className="w-full px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-xs"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Jornada */}
-                          <div className="md:col-span-4">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Jornada
-                            </label>
-                            <select
-                              value={sess.jornada || "mañana"}
-                              onChange={(e) =>
-                                handleSessionChange(idx, "jornada", e.target.value)
-                              }
-                              className="w-full px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-xs"
-                            >
-                              <option value="mañana">Mañana</option>
-                              <option value="tarde">Tarde</option>
-                              <option value="noche">Noche</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Botones de navegación inferior */}
-          <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-8">
-            {currentStep > 1 ? (
-              <button
-                type="button"
-                onClick={handlePrevStep}
-                disabled={saving}
-                className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold transition-colors cursor-pointer"
-              >
-                Anterior
               </button>
-            ) : (
-              <div />
-            )}
+            );
+          })}
+        </div>
 
-            <div className="flex items-center gap-3">
-              {currentStep < steps.length ? (
-                <button
-                  type="button"
-                  onClick={handleNextStep}
-                  disabled={saving}
-                  className="px-6 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer"
-                >
-                  Siguiente
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={saving || uploadingPoster}
-                  className="inline-flex items-center justify-center px-7 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {saving || uploadingPoster ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      {uploadingPoster ? "Subiendo póster..." : "Guardando..."}
-                    </>
-                  ) : isEdit ? (
-                    "Guardar Cambios"
-                  ) : (
-                    "Crear Congreso"
-                  )}
-                </button>
-              )}
-            </div>
+        {/* Barra de progreso sutil integrada */}
+        <div className="mt-2 pt-2 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between px-1 text-[11px] text-zinc-400 dark:text-zinc-500">
+          <span>
+            Progreso: {Math.round((step / 4) * 100)}% ({steps[step - 1].name})
+          </span>
+          <div className="w-24 sm:w-32 h-1 rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden">
+            <div
+              className="h-full bg-[#00345e] dark:bg-blue-400 rounded-full transition-all duration-300"
+              style={{ width: `${(step / 4) * 100}%` }}
+            />
           </div>
         </div>
       </div>
 
-      {/* Modal para Registrar Empresa en Catálogo de Patrocinadores */}
+      {/* Tarjeta Principal del Formulario */}
+      <div
+        className={`rounded-xl border transition-colors p-4 sm:p-5 shadow-2xs ${
+          isDark ? "bg-[#16161a] border-white/[0.08]" : "bg-white border-black/[0.08]"
+        }`}
+      >
+        {step === 1 && (
+          <StepGeneralData
+            formData={formData}
+            onChange={handleChange}
+            editionCheck={editionCheck}
+            validationErrors={validationErrors}
+            thematicTracks={thematicTracks}
+            onAddTrack={handleAddTrack}
+            onRemoveTrack={handleRemoveTrack}
+            onChangeTrack={handleChangeTrack}
+          />
+        )}
+
+        {step === 2 && (
+          <StepDescriptionPoster
+            formData={formData}
+            onChange={handleChange}
+            posterFile={posterFile}
+            posterPreview={posterPreview}
+            onPosterChange={handlePosterChange}
+            uploadingPoster={uploadingPoster}
+            validationErrors={validationErrors}
+            targetAudiences={targetAudiences}
+            onAddAudience={handleAddAudience}
+            onRemoveAudience={handleRemoveAudience}
+            onChangeAudience={handleChangeAudience}
+          />
+        )}
+
+        {step === 3 && (
+          <StepSessions
+            sessions={sessions}
+            onAddSession={handleAddSession}
+            onRemoveSession={handleRemoveSession}
+            onSessionChange={handleSessionChange}
+            availableSpeakers={availableSpeakers}
+            formData={formData}
+            validationErrors={validationErrors}
+          />
+        )}
+
+        {step === 4 && (
+          <StepSponsors
+            sponsors={sponsors}
+            onAddSponsor={handleAddSponsor}
+            onRemoveSponsor={handleRemoveSponsor}
+            onSponsorChange={handleSponsorChange}
+            availableSponsors={availableSponsors}
+            onOpenCreateSponsorModal={() => setIsSponsorModalOpen(true)}
+            validationErrors={validationErrors}
+          />
+        )}
+      </div>
+
+      {/* Mensajes de Error si ocurren */}
+      {submitError && (
+        <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 p-3 rounded-lg text-xs">
+          <p className="font-semibold">Error al guardar:</p>
+          <p className="mt-0.5">{submitError}</p>
+        </div>
+      )}
+
+      {Object.keys(validationErrors).length > 0 && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300 p-3 rounded-lg text-xs">
+          <p className="font-semibold">Hay campos incompletos o con formato inválido:</p>
+          <ul className="list-disc list-inside mt-1 space-y-0.5 text-xs">
+            {Object.values(validationErrors)
+              .slice(0, 4)
+              .map((err, idx) => (
+                <li key={idx}>{err}</li>
+              ))}
+            {Object.keys(validationErrors).length > 4 && (
+              <li>... y {Object.keys(validationErrors).length - 4} más</li>
+            )}
+          </ul>
+        </div>
+      )}
+
+      {/* Espaciador para no tapar el final con la barra sticky */}
+      <div className="h-6" />
+
+      {/* Barra de Navegación Pegada al Fondo (Sticky Bottom Bar) */}
+      <div className="sticky bottom-0 -mx-4 sm:-mx-6 lg:-mx-8 -mb-4 sm:-mb-6 lg:-mb-8 px-4 sm:px-6 lg:px-8 py-3 bg-white/95 dark:bg-[#121215]/95 backdrop-blur-md border-t border-black/[0.08] dark:border-white/[0.08] flex items-center justify-between z-30 shadow-md">
+        <button
+          type="button"
+          onClick={() => setStep(Math.max(1, step - 1))}
+          disabled={step === 1 || uploadingPoster || saving}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-medium text-xs sm:text-sm transition-all cursor-pointer border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed shadow-2xs"
+        >
+          <ArrowLeftIcon className="w-3.5 h-3.5" />
+          <span>Atrás</span>
+        </button>
+
+        <div className="hidden sm:flex items-center gap-2 text-xs">
+          <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+            Paso {step} de 4:
+          </span>
+          <span className="text-zinc-500 dark:text-zinc-400">
+            {steps[step - 1].name}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {step < 4 ? (
+            <button
+              type="button"
+              onClick={handleNextStep}
+              disabled={uploadingPoster || saving}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#00345e] hover:bg-[#002747] active:bg-[#001f38] text-white rounded-lg transition-all font-medium text-xs sm:text-sm shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer border-0"
+            >
+              <span>Continuar</span>
+              <ArrowRightIcon className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={saving || uploadingPoster}
+              className="inline-flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition font-medium text-xs sm:text-sm shadow-2xs cursor-pointer border-0"
+            >
+              {saving ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Publicando...</span>
+                </>
+              ) : uploadingPoster ? (
+                "Subiendo afiche..."
+              ) : isEdit ? (
+                "Guardar cambios"
+              ) : (
+                "Publicar congreso"
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Modal para crear un patrocinador directamente sin salir */}
       <CreateSponsorModal
         isOpen={isSponsorModalOpen}
         onClose={() => setIsSponsorModalOpen(false)}

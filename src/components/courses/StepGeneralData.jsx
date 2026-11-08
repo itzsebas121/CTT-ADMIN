@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"
-import CategoryCreation from "../ui/CategoryCreation"
-import { getAllCategories } from "../../api/categories"
+import { useState, useEffect } from "react";
+import CategoryCreation from "../ui/CategoryCreation";
+import { getAllCategories } from "../../api/categories";
+import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default function StepGeneralData({
   courseData,
@@ -8,12 +9,12 @@ export default function StepGeneralData({
   onArrayChange,
   onAddArrayItem,
   onRemoveArrayItem,
-  validationErrors = {}
+  validationErrors = {},
 }) {
-  const [categories, setCategories] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const statuses = ['Activo', 'Cerrado']
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const statuses = ["Activo", "Cerrado"];
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -22,247 +23,326 @@ export default function StepGeneralData({
         const response = await getAllCategories();
         const CategoriesArray = response.items || response;
 
-        const categoriesData = CategoriesArray.map(cat => ({
+        const categoriesData = CategoriesArray.map((cat) => ({
           id: cat.id,
           name: cat.name,
-        }))
+        }));
         setCategories(categoriesData);
 
-        // Si no hay categoría seleccionada, seleccionar la primera por defecto
         if (!courseData.category_id && categoriesData.length > 0) {
-          onChange('category_id', categoriesData[0].id);
+          onChange("category_id", categoriesData[0].id);
         }
       } catch (error) {
-        console.error('Error al obtener categorías:', error);
+        console.error("Error al obtener categorías:", error);
       } finally {
         setIsLoading(false);
       }
-    }
+    };
+
     fetchCategories();
-  }, [])
+  }, []);
 
   const handleAddCategory = () => {
-    setIsModalOpen(true)
-  }
+    setIsModalOpen(true);
+  };
 
   const handleCreateCategory = (categoryData) => {
     const newCategory = {
       id: categoryData.id,
       name: categoryData.name,
-    }
-    setCategories(prev => [...prev, newCategory])
-    onChange('category_id', categoryData.id)
-  }
+    };
+    setCategories((prev) => [...prev, newCategory]);
+    onChange("category_id", categoryData.id);
+  };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <p className="text-sm font-semibold text-primary">El punto de partida</p>
-        <h2 className="text-2xl font-bold text-slate-900 mt-1">Cuéntanos sobre el curso</h2>
-        <p className="text-sm text-slate-500 mt-2">Esta información aparecerá en el catálogo y ayudará a elegirlo.</p>
-      </div>
+    <div className="space-y-4">
+      {/* Grid de 2 Columnas: Izquierda (Datos Básicos) - Derecha (Listas y Objetivos) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        {/* COLUMNA 1: Datos Básicos y Clasificación */}
+        <div className="rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-zinc-50/40 dark:bg-white/[0.02] p-4 space-y-3.5">
+          <div className="pb-2 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+            <h2 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+              Datos Principales
+            </h2>
+            <span className="text-[11px] text-zinc-400">Paso 1 de 4</span>
+          </div>
 
-      <div className="space-y-5">
-        {/* Título */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2 flex justify-between">
-            <span>Título del Curso <span className="text-red-500">*</span></span>
-            <span className="text-xs text-gray-400 font-normal">({(courseData.title || '').length}/120)</span>
-          </label>
-          <input
-            type="text"
-            value={courseData.title || ''}
-            maxLength={120}
-            required
-            onChange={(e) => onChange('title', e.target.value)}
-            className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition ${
-              validationErrors.title ? 'border-red-500 bg-red-50/20' : 'border-gray-300'
-            }`}
-            placeholder="Ej: Introducción a React y TypeScript"
-          />
-          {validationErrors.title && (
-            <p className="text-xs text-red-600 mt-1 font-medium">{validationErrors.title}</p>
-          )}
-        </div>
-
-        {/* Descripción */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2 flex justify-between">
-            <span>Descripción <span className="text-red-500">*</span></span>
-            <span className="text-xs text-gray-400 font-normal">({(courseData.description || '').length}/1000)</span>
-          </label>
-          <textarea
-            value={courseData.description || ''}
-            maxLength={1000}
-            required
-            onChange={(e) => onChange('description', e.target.value)}
-            className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition resize-y ${
-              validationErrors.description ? 'border-red-500 bg-red-50/20' : 'border-gray-300'
-            }`}
-            rows="4"
-            placeholder="Describe los temas, objetivos y habilidades que adquirirá el estudiante..."
-          />
-          {validationErrors.description && (
-            <p className="text-xs text-red-600 mt-1 font-medium">{validationErrors.description}</p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-          {/* Categoría */}
+          {/* Título */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Categoría <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={courseData.category_id ?? ''}
-              onChange={(e) => onChange('category_id', e.target.value ? parseInt(e.target.value, 10) : '')}
-              disabled={isLoading}
-              className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition bg-white ${
-                validationErrors.category_id ? 'border-red-500 bg-red-50/20' : 'border-gray-300'
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                Título del Curso <span className="text-red-500">*</span>
+              </label>
+              <span className="text-[10px] text-zinc-400">
+                {(courseData.title || "").length}/120
+              </span>
+            </div>
+            <input
+              type="text"
+              value={courseData.title || ""}
+              maxLength={120}
+              required
+              onChange={(e) => onChange("title", e.target.value)}
+              className={`w-full rounded-lg border text-xs sm:text-sm px-3 py-2 transition-colors outline-none ${
+                validationErrors.title
+                  ? "border-red-500 bg-red-50/30 dark:bg-red-950/20 text-zinc-900 dark:text-white"
+                  : "border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:border-[#00345e] dark:focus:border-blue-400"
               }`}
-            >
-              <option value="">-- Selecciona una categoría --</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-            {validationErrors.category_id && (
-              <p className="text-xs text-red-600 mt-1 font-medium">{validationErrors.category_id}</p>
+              placeholder="Ej: Desarrollo Web Full Stack con React y TypeScript"
+            />
+            {validationErrors.title && (
+              <p className="text-[11px] text-red-600 dark:text-red-400 mt-0.5">
+                {validationErrors.title}
+              </p>
             )}
-            <button
-              type="button"
-              className="mt-2 text-xs text-primary hover:underline font-semibold cursor-pointer"
-              onClick={handleAddCategory}
-            >
-              + Registrar Nueva Categoría
-            </button>
           </div>
 
-          {/* Estado del Curso */}
+          {/* Descripción */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Estado del Curso *</label>
-            <select
-              value={courseData.status || 'Activo'}
-              onChange={(e) => onChange('status', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition bg-white"
-            >
-              {statuses.map(status => (
-                <option key={status} value={status}>{status}</option>
-              ))}
-            </select>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                Descripción <span className="text-red-500">*</span>
+              </label>
+              <span className="text-[10px] text-zinc-400">
+                {(courseData.description || "").length}/1000
+              </span>
+            </div>
+            <textarea
+              value={courseData.description || ""}
+              maxLength={1000}
+              required
+              rows={3}
+              onChange={(e) => onChange("description", e.target.value)}
+              className={`w-full rounded-lg border text-xs sm:text-sm px-3 py-2 transition-colors outline-none resize-y ${
+                validationErrors.description
+                  ? "border-red-500 bg-red-50/30 dark:bg-red-950/20 text-zinc-900 dark:text-white"
+                  : "border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:border-[#00345e] dark:focus:border-blue-400"
+              }`}
+              placeholder="Describe las habilidades, proyectos y competencias que adquirirá el estudiante..."
+            />
+            {validationErrors.description && (
+              <p className="text-[11px] text-red-600 dark:text-red-400 mt-0.5">
+                {validationErrors.description}
+              </p>
+            )}
           </div>
 
-          {/* Lugar */}
+          {/* Categoría y Estado en 2 columnas */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  Categoría <span className="text-red-500">*</span>
+                </label>
+                <button
+                  type="button"
+                  className="text-[11px] text-[#00345e] dark:text-blue-400 hover:underline cursor-pointer border-0 bg-transparent p-0"
+                  onClick={handleAddCategory}
+                >
+                  + Nueva
+                </button>
+              </div>
+              <select
+                value={courseData.category_id ?? ""}
+                onChange={(e) =>
+                  onChange(
+                    "category_id",
+                    e.target.value ? parseInt(e.target.value, 10) : ""
+                  )
+                }
+                disabled={isLoading}
+                className={`w-full rounded-lg border text-xs sm:text-sm px-2.5 py-2 transition-colors outline-none ${
+                  validationErrors.category_id
+                    ? "border-red-500 bg-red-50/30 dark:bg-red-950/20"
+                    : "border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:border-[#00345e] dark:focus:border-blue-400"
+                }`}
+              >
+                <option value="" className="dark:bg-[#121215]">
+                  -- Seleccionar --
+                </option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id} className="dark:bg-[#121215]">
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              {validationErrors.category_id && (
+                <p className="text-[11px] text-red-600 dark:text-red-400 mt-0.5">
+                  {validationErrors.category_id}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                Estado <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={courseData.status || "Activo"}
+                onChange={(e) => onChange("status", e.target.value)}
+                className="w-full rounded-lg border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-[#121215] text-zinc-900 dark:text-white text-xs sm:text-sm px-2.5 py-2 transition-colors outline-none focus:border-[#00345e] dark:focus:border-blue-400"
+              >
+                {statuses.map((status) => (
+                  <option key={status} value={status} className="dark:bg-[#121215]">
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Lugar / Campus */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
               Lugar / Campus <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              value={courseData.place || ''}
+              value={courseData.place || ""}
               maxLength={150}
               required
-              onChange={(e) => onChange('place', e.target.value)}
-              className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition ${
-                validationErrors.place ? 'border-red-500 bg-red-50/20' : 'border-gray-300'
+              onChange={(e) => onChange("place", e.target.value)}
+              className={`w-full rounded-lg border text-xs sm:text-sm px-3 py-2 transition-colors outline-none ${
+                validationErrors.place
+                  ? "border-red-500 bg-red-50/30 dark:bg-red-950/20"
+                  : "border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:border-[#00345e] dark:focus:border-blue-400"
               }`}
               placeholder="Ej: Campus Huachi, Laboratorio 101"
             />
             {validationErrors.place && (
-              <p className="text-xs text-red-600 mt-1 font-medium">{validationErrors.place}</p>
+              <p className="text-[11px] text-red-600 dark:text-red-400 mt-0.5">
+                {validationErrors.place}
+              </p>
             )}
           </div>
         </div>
 
-        {/* Objetivos */}
-        <ArrayField
-          label="Objetivos del Curso *"
-          error={validationErrors.objectives}
-          items={courseData.objectives || ['']}
-          onItemChange={(i, value) => onArrayChange('objectives', i, value)}
-          onAddItem={() => onAddArrayItem('objectives')}
-          onRemoveItem={(i) => onRemoveArrayItem('objectives', i)}
-          placeholder={(i) => `Objetivo ${i + 1} (Ej: Aprender fundamentos de programación)`}
-        />
+        {/* COLUMNA 2: Participantes, Materiales y Objetivos */}
+        <div className="space-y-3">
+          {/* Objetivos */}
+          <ArrayField
+            label="Objetivos de Aprendizaje"
+            required
+            error={validationErrors.objectives}
+            items={courseData.objectives || [""]}
+            onItemChange={(i, value) => onArrayChange("objectives", i, value)}
+            onAddItem={() => onAddArrayItem("objectives")}
+            onRemoveItem={(i) => onRemoveArrayItem("objectives", i)}
+            placeholder={(i) => `Objetivo ${i + 1} (Ej: Desarrollar APIs REST seguras)`}
+          />
 
-        {/* Organizadores */}
-        <ArrayField
-          label="Organizadores / Docentes *"
-          error={validationErrors.organizers}
-          items={courseData.organizers || ['']}
-          onItemChange={(i, value) => onArrayChange('organizers', i, value)}
-          onAddItem={() => onAddArrayItem('organizers')}
-          onRemoveItem={(i) => onRemoveArrayItem('organizers', i)}
-          placeholder={(i) => `Organizador ${i + 1} (Ej: Ing. Juan Pérez)`}
-        />
+          {/* Docentes / Organizadores */}
+          <ArrayField
+            label="Docentes / Organizadores"
+            required
+            error={validationErrors.organizers}
+            items={courseData.organizers || [""]}
+            onItemChange={(i, value) => onArrayChange("organizers", i, value)}
+            onAddItem={() => onAddArrayItem("organizers")}
+            onRemoveItem={(i) => onRemoveArrayItem("organizers", i)}
+            placeholder={(i) => `Docente ${i + 1} (Ej: Ing. Marco Morales, M.Sc.)`}
+          />
 
-        {/* Materiales */}
-        <ArrayField
-          label="Materiales Requeridos *"
-          error={validationErrors.materials}
-          items={courseData.materials || ['']}
-          onItemChange={(i, value) => onArrayChange('materials', i, value)}
-          onAddItem={() => onAddArrayItem('materials')}
-          onRemoveItem={(i) => onRemoveArrayItem('materials', i)}
-          placeholder={(i) => `Material ${i + 1} (Ej: Laptop personal)`}
-        />
+          {/* Materiales Requeridos */}
+          <ArrayField
+            label="Materiales / Requisitos Técnicos"
+            required
+            error={validationErrors.materials}
+            items={courseData.materials || [""]}
+            onItemChange={(i, value) => onArrayChange("materials", i, value)}
+            onAddItem={() => onAddArrayItem("materials")}
+            onRemoveItem={(i) => onRemoveArrayItem("materials", i)}
+            placeholder={(i) => `Herramienta ${i + 1} (Ej: Computador con 8GB RAM)`}
+          />
 
-        {/* Público Objetivo */}
-        <ArrayField
-          label="Público Objetivo *"
-          error={validationErrors.target_audience}
-          items={courseData.target_audience || ['']}
-          onItemChange={(i, value) => onArrayChange('target_audience', i, value)}
-          onAddItem={() => onAddArrayItem('target_audience')}
-          onRemoveItem={(i) => onRemoveArrayItem('target_audience', i)}
-          placeholder={(i) => `Público ${i + 1} (Ej: Estudiantes de sistemas)`}
-        />
+          {/* Público Objetivo */}
+          <ArrayField
+            label="Público Objetivo"
+            required
+            error={validationErrors.target_audience}
+            items={courseData.target_audience || [""]}
+            onItemChange={(i, value) => onArrayChange("target_audience", i, value)}
+            onAddItem={() => onAddArrayItem("target_audience")}
+            onRemoveItem={(i) => onRemoveArrayItem("target_audience", i)}
+            placeholder={(i) => `Perfil ${i + 1} (Ej: Estudiantes de TI, Desarrolladores Junior)`}
+          />
+        </div>
       </div>
 
-      {/* Modal para crear categoría */}
       <CategoryCreation
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleCreateCategory}
+        onCreateCategory={handleCreateCategory}
       />
     </div>
-  )
+  );
 }
 
-function ArrayField({ label, items, onItemChange, onAddItem, onRemoveItem, placeholder, error }) {
+function ArrayField({
+  label,
+  required,
+  error,
+  items,
+  onItemChange,
+  onAddItem,
+  onRemoveItem,
+  placeholder,
+}) {
   return (
-    <div className={`bg-gray-50 rounded-2xl p-5 border ${error ? 'border-red-300' : 'border-gray-200'}`}>
-      <div className="flex justify-between items-center mb-3">
-        <label className="block text-sm font-semibold text-gray-700">{label}</label>
-        {error && <span className="text-xs text-red-600 font-medium">{error}</span>}
+    <div
+      className={`rounded-xl border p-3 sm:p-3.5 transition-colors ${
+        error
+          ? "border-red-400 bg-red-50/20"
+          : "border-black/[0.08] dark:border-white/[0.08] bg-zinc-50/40 dark:bg-white/[0.02]"
+      }`}
+    >
+      <div className="flex justify-between items-center mb-2">
+        <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        {error && (
+          <span className="text-[11px] text-red-600 dark:text-red-400">
+            {error}
+          </span>
+        )}
       </div>
-      {items.map((item, i) => (
-        <div key={i} className="flex flex-col md:flex-row gap-2 mb-3">
-          <input
-            type="text"
-            value={item}
-            onChange={(e) => onItemChange(i, e.target.value)}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm"
-            placeholder={typeof placeholder === 'function' ? placeholder(i) : placeholder}
-          />
-          {items.length > 1 && (
-            <button
-              type="button"
-              onClick={() => onRemoveItem(i)}
-              className="px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition"
-            >
-              Eliminar
-            </button>
-          )}
-        </div>
-      ))}
+
+      <div className="space-y-1.5">
+        {items.map((item, i) => (
+          <div key={i} className="flex items-center gap-1.5">
+            <span className="text-[11px] font-medium text-zinc-400 w-4 text-right shrink-0">
+              {i + 1}.
+            </span>
+            <input
+              type="text"
+              value={item}
+              onChange={(e) => onItemChange(i, e.target.value)}
+              className="flex-1 rounded-lg border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-[#121215] text-zinc-900 dark:text-white px-2.5 py-1.5 text-xs outline-none focus:border-[#00345e] dark:focus:border-blue-400 transition-colors"
+              placeholder={typeof placeholder === "function" ? placeholder(i) : placeholder}
+            />
+            {items.length > 1 && (
+              <button
+                type="button"
+                onClick={() => onRemoveItem(i)}
+                className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer shrink-0"
+                title="Eliminar fila"
+              >
+                <TrashIcon className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
       <button
         type="button"
         onClick={onAddItem}
-        className="px-4 py-2 bg-white hover:bg-gray-100 text-primary border border-primary/30 rounded-lg transition text-xs font-semibold shadow-xs cursor-pointer"
+        className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-[#00345e] dark:text-blue-400 border border-black/[0.08] dark:border-white/[0.1] rounded-lg text-xs font-medium transition cursor-pointer shadow-2xs"
       >
-        + Agregar elemento
+        <PlusIcon className="w-3 h-3" />
+        <span>Agregar fila</span>
       </button>
     </div>
-  )
+  );
 }

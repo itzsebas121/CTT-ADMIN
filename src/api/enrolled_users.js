@@ -47,3 +47,32 @@ export const searchEnrolledUsers = async (
 ) => {
   return getEnrolledUsers(courseId, page, pageSize, query, status);
 };
+
+/**
+ * Obtiene la lista paginada y filtrada de usuarios inscritos en un congreso.
+ * Endpoint: GET /api/v1/enrollments/congress/{congress_id}
+ */
+export const getCongressEnrolledUsers = async (
+  congressId,
+  page = 1,
+  pageSize = 10,
+  searchTerm = "",
+  status = null
+) => {
+  const params = {
+    page,
+    page_size: pageSize,
+  };
+
+  if (searchTerm && searchTerm.trim().length > 0) {
+    params.search_term = searchTerm.trim();
+  }
+
+  if (status && status !== "All") {
+    params.enrollment_status = status;
+  }
+
+  const response = await api.get(`/enrollments/congress/${congressId}`, { params });
+  return response.data;
+};
+

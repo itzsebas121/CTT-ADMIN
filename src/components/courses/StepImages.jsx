@@ -1,67 +1,107 @@
+import { PhotoIcon } from "@heroicons/react/24/outline";
+
 export default function StepImages({ banner, detail, onChangeImage, validationErrors = {} }) {
   return (
-    <div className="space-y-8">
-      <div>
-        <p className="text-sm font-semibold text-primary">La primera impresión</p>
-        <h2 className="text-2xl font-bold text-slate-900 mt-1">Elige las imágenes del curso</h2>
-        <p className="text-sm text-slate-500 mt-2">Usa una portada horizontal y una imagen de detalle que representen la experiencia.</p>
-      </div>
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Banner Image (16:9) */}
+        <div className="rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-zinc-50/40 dark:bg-white/[0.02] p-4 space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-0.5">
+              Imagen de Portada (Banner) <span className="text-red-500">*</span>
+            </label>
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+              Proporción 16:9 recomendada (1280 × 720 px para el catálogo).
+            </p>
+          </div>
 
-      {/* Banner Image */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Imagen de banner <span className="text-red-500">*</span>
-        </label>
-        <div className="flex flex-col sm:flex-row items-start gap-6">
-          <div className={`w-full sm:w-64 h-auto sm:h-36 bg-slate-100 border rounded-2xl flex items-center justify-center overflow-hidden ${
-            validationErrors.course_image ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200'
-          }`}>
+          <div
+            className={`w-full aspect-video rounded-lg border flex items-center justify-center overflow-hidden transition-colors ${
+              banner
+                ? 'bg-black/5 dark:bg-white/5 border-black/[0.08] dark:border-white/10'
+                : 'bg-zinc-100 dark:bg-white/[0.04] border-dashed border-zinc-300 dark:border-white/20'
+            } ${validationErrors.course_image ? 'border-red-500 ring-1 ring-red-300' : ''}`}
+          >
             {banner ? (
               <img src={banner} alt="Preview banner" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-gray-400 text-sm">Sin imagen</span>
+              <div className="flex flex-col items-center text-zinc-400 dark:text-zinc-500">
+                <PhotoIcon className="w-7 h-7 mb-1" />
+                <span className="text-[11px]">Sin imagen seleccionada</span>
+              </div>
             )}
           </div>
-          <div className="w-full sm:w-auto">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => onChangeImage('course_image', e.target.files?.[0])}
-              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
-            />
-            <p className="mt-2 text-xs text-gray-500">Se mostrará como banner del curso (relación 16:9 recomendada).</p>
+
+          <div>
+            <label className="inline-block w-full">
+              <span className="sr-only">Seleccionar archivo</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => onChangeImage('course_image', e.target.files?.[0])}
+                className="block w-full text-xs text-zinc-600 dark:text-zinc-400
+                  file:mr-2.5 file:py-1.5 file:px-3
+                  file:rounded-lg file:border-0
+                  file:text-xs file:font-medium
+                  file:bg-[#00345e] file:text-white
+                  hover:file:bg-[#002747]
+                  dark:file:bg-blue-600 dark:hover:file:bg-blue-700
+                  file:cursor-pointer cursor-pointer"
+              />
+            </label>
             {validationErrors.course_image && (
-              <p className="text-xs text-red-600 mt-1 font-medium">{validationErrors.course_image}</p>
+              <p className="text-[11px] text-red-600 dark:text-red-400 mt-1 font-medium">{validationErrors.course_image}</p>
             )}
           </div>
         </div>
-      </div>
 
-      {/* Detail Image */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Imagen de detalle <span className="text-red-500">*</span>
-        </label>
-        <div className="flex flex-col sm:flex-row items-start gap-6">
-          <div className={`w-full sm:w-64 h-auto sm:h-80 bg-slate-100 border rounded-2xl flex items-center justify-center overflow-hidden ${
-            validationErrors.course_image_detail ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200'
-          }`}>
+        {/* Detail Image */}
+        <div className="rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-zinc-50/40 dark:bg-white/[0.02] p-4 space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-0.5">
+              Imagen de Detalle / Afiche <span className="text-red-500">*</span>
+            </label>
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+              Formato vertical o cuadrado para la ficha de inscripción.
+            </p>
+          </div>
+
+          <div
+            className={`w-full aspect-video md:aspect-[4/3] rounded-lg border flex items-center justify-center overflow-hidden transition-colors ${
+              detail
+                ? 'bg-black/5 dark:bg-white/5 border-black/[0.08] dark:border-white/10'
+                : 'bg-zinc-100 dark:bg-white/[0.04] border-dashed border-zinc-300 dark:border-white/20'
+            } ${validationErrors.course_image_detail ? 'border-red-500 ring-1 ring-red-300' : ''}`}
+          >
             {detail ? (
               <img src={detail} alt="Preview detalle" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-gray-400 text-sm">Sin imagen</span>
+              <div className="flex flex-col items-center text-zinc-400 dark:text-zinc-500">
+                <PhotoIcon className="w-7 h-7 mb-1" />
+                <span className="text-[11px]">Sin imagen seleccionada</span>
+              </div>
             )}
           </div>
-          <div className="w-full sm:w-auto">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => onChangeImage('course_image_detail', e.target.files?.[0])}
-              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
-            />
-            <p className="mt-2 text-xs text-gray-500">Se mostrará en la vista detallada del curso (formato vertical o cuadrado).</p>
+
+          <div>
+            <label className="inline-block w-full">
+              <span className="sr-only">Seleccionar archivo</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => onChangeImage('course_image_detail', e.target.files?.[0])}
+                className="block w-full text-xs text-zinc-600 dark:text-zinc-400
+                  file:mr-2.5 file:py-1.5 file:px-3
+                  file:rounded-lg file:border-0
+                  file:text-xs file:font-medium
+                  file:bg-[#00345e] file:text-white
+                  hover:file:bg-[#002747]
+                  dark:file:bg-blue-600 dark:hover:file:bg-blue-700
+                  file:cursor-pointer cursor-pointer"
+              />
+            </label>
             {validationErrors.course_image_detail && (
-              <p className="text-xs text-red-600 mt-1 font-medium">{validationErrors.course_image_detail}</p>
+              <p className="text-[11px] text-red-600 dark:text-red-400 mt-1 font-medium">{validationErrors.course_image_detail}</p>
             )}
           </div>
         </div>

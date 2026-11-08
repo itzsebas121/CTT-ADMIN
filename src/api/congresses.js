@@ -191,11 +191,8 @@ export const checkCongressEdition = async (edicion, anio, excludeCongressId = nu
 export const getCongressYears = async () => {
   try {
     const response = await api.get('/congresses-new/years');
-    return response.data;
+    return response.data?.data?.years || response.data?.years || response.data || [];
   } catch (error) {
-    if (error.response) {
-      return [];
-    }
     return [];
   }
 };

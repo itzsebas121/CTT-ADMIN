@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createSponsor, uploadCongressPoster } from '../../api/congresses';
 import { toast } from 'react-toastify';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function CreateSponsorModal({ isOpen, onClose, onCreated }) {
   const [formData, setFormData] = useState({
@@ -74,7 +75,6 @@ export default function CreateSponsorModal({ isOpen, onClose, onCreated }) {
       if (onCreated) {
         onCreated(newSponsor);
       }
-      // Reset form
       setFormData({
         nombre: '',
         sitio_web: '',
@@ -96,35 +96,37 @@ export default function CreateSponsorModal({ isOpen, onClose, onCreated }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl border border-gray-100"
+        className="bg-white dark:bg-[#16161a] rounded-xl w-full max-w-lg p-5 shadow-2xl border border-black/[0.08] dark:border-white/[0.08] transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center pb-3 mb-4 border-b border-gray-100">
+        <div className="flex justify-between items-center pb-3 mb-3.5 border-b border-black/[0.06] dark:border-white/[0.08]">
           <div>
-            <h3 className="text-lg font-bold text-gray-900">Registrar Nuevo Patrocinador</h3>
-            <p className="text-xs text-gray-500">
-              Registra una nueva empresa en el catálogo para asociarla a congresos
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
+              Registrar Nuevo Patrocinador
+            </h3>
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              Añade una empresa u organización al catálogo para auspiciar congresos
             </p>
           </div>
           <button
             type="button"
-            className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 rounded-md transition-colors cursor-pointer"
             onClick={onClose}
           >
-            &times;
+            <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl">
+          <div className="mb-3.5 p-2.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40 text-red-700 dark:text-red-300 text-xs rounded-lg">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Nombre de la Empresa / Organización <span className="text-red-500">*</span>
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              Nombre de la Empresa / Entidad <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -133,13 +135,13 @@ export default function CreateSponsorModal({ isOpen, onClose, onCreated }) {
               maxLength={100}
               value={formData.nombre}
               onChange={handleChange}
-              placeholder="Ej: Banco Pichincha, Google, Microsoft"
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              placeholder="Ej: Google Cloud, Banco Pichincha, IEEE Ecuador"
+              className="w-full h-9 px-3 rounded-lg border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
               Sitio Web Oficial <span className="text-red-500">*</span>
             </label>
             <input
@@ -150,12 +152,12 @@ export default function CreateSponsorModal({ isOpen, onClose, onCreated }) {
               value={formData.sitio_web}
               onChange={handleChange}
               placeholder="https://empresa.com"
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full h-9 px-3 rounded-lg border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
               Descripción de la Empresa <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -166,35 +168,35 @@ export default function CreateSponsorModal({ isOpen, onClose, onCreated }) {
               value={formData.descripcion}
               onChange={handleChange}
               placeholder="Breve reseña o actividad de la entidad auspiciante..."
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+              className="w-full p-2.5 rounded-lg border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400 resize-none transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
               Logo de la Empresa (Opcional)
             </label>
             <input
               type="file"
               accept="image/*"
               onChange={handleLogoFileChange}
-              className="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+              className="block w-full text-xs text-zinc-500 dark:text-zinc-400 file:mr-2.5 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-[#00345e]/10 dark:file:bg-blue-400/10 file:text-[#00345e] dark:file:text-blue-300 hover:file:bg-[#00345e]/20 cursor-pointer"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
+          <div className="flex justify-end gap-2 pt-2.5 border-t border-black/[0.06] dark:border-white/[0.08]">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-3.5 py-2 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50"
+              className="px-3 py-1.5 border border-black/[0.08] dark:border-white/[0.08] rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+              className="px-3.5 py-1.5 bg-[#00345e] hover:bg-[#002747] text-white rounded-lg text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer shadow-2xs border-0"
             >
               {loading ? 'Guardando...' : 'Guardar y Vincular'}
             </button>
@@ -204,4 +206,3 @@ export default function CreateSponsorModal({ isOpen, onClose, onCreated }) {
     </div>
   );
 }
-
