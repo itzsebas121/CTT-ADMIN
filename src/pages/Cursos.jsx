@@ -91,6 +91,10 @@ export default function Cursos() {
     return rawCourses.map((course) => ({
       titulo: course.title,
       estado: (() => {
+        const isPast = course.requirements?.registration?.endDate
+          ? new Date(course.requirements.registration.endDate + "T23:59:59") < new Date()
+          : false;
+        if (isPast) return "Finalizado";
         const s = String(course.status || "").toLowerCase();
         if (s === "activo") return "Activo";
         if (s === "inactivo") return "Cerrado";

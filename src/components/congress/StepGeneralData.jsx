@@ -205,9 +205,133 @@ export default function StepGeneralData({
                 />
                 <MapPinIcon className="w-4 h-4 text-zinc-400 absolute left-2.5 top-2.5" />
               </div>
-              <p className="text-[10px] text-zinc-400 mt-1">
-                Servirá como referencia predeterminada para las salas del cronograma.
-              </p>
+            </div>
+
+            {/* Modalidad y Horas Académicas */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Modalidad
+                </label>
+                <select
+                  name="modalidad"
+                  value={formData.modalidad || "Presencial"}
+                  onChange={onChange}
+                  className="w-full h-9 px-2.5 rounded-lg border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400 transition-all cursor-pointer"
+                >
+                  <option value="Presencial">Presencial</option>
+                  <option value="Híbrido">Híbrido (Presencial + Virtual)</option>
+                  <option value="Virtual">Virtual / Online</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Duración Acreditada (Horas)
+                </label>
+                <input
+                  type="number"
+                  name="duracion_horas"
+                  value={formData.duracion_horas || 40}
+                  onChange={onChange}
+                  min={1}
+                  placeholder="40"
+                  className="w-full h-9 px-3 rounded-lg border border-black/[0.08] dark:border-white/[0.08] text-xs sm:text-sm bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Sitio Web Oficial y Cupo Máximo */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Sitio Web Oficial
+                </label>
+                <input
+                  type="url"
+                  name="sitio_web_oficial"
+                  value={formData.sitio_web_oficial || ""}
+                  onChange={onChange}
+                  placeholder="https://csei.uta.edu.ec"
+                  className="w-full h-9 px-3 rounded-lg border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Aforo / Cupo Máximo
+                </label>
+                <input
+                  type="number"
+                  name="cupo_maximo"
+                  value={formData.cupo_maximo || 250}
+                  onChange={onChange}
+                  min={10}
+                  placeholder="250"
+                  className="w-full h-9 px-3 rounded-lg border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Aranceles y Tarifas Diferenciadas */}
+            <div className="p-3 rounded-lg border border-black/[0.05] dark:border-white/[0.06] bg-zinc-100/50 dark:bg-white/[0.01] space-y-2.5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                  Aranceles e Inscripciones (USD)
+                </p>
+                <span className="text-[10px] text-zinc-400 font-medium">0.00 para acceso libre</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-[11px] font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                    Estudiante UTA
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-2 text-xs text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      name="costo_estudiante_uta"
+                      value={formData.costo_estudiante_uta ?? 0}
+                      onChange={onChange}
+                      className="w-full h-8 pl-6 pr-2 rounded-md border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                    Profesional
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-2 text-xs text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      name="costo_profesional"
+                      value={formData.costo_profesional ?? 0}
+                      onChange={onChange}
+                      className="w-full h-8 pl-6 pr-2 rounded-md border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                    Ponente Paper
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-2 text-xs text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      name="costo_ponente"
+                      value={formData.costo_ponente ?? 0}
+                      onChange={onChange}
+                      className="w-full h-8 pl-6 pr-2 rounded-md border border-black/[0.08] dark:border-white/[0.08] text-xs bg-white dark:bg-[#121215] text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00345e] dark:focus:ring-blue-400"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Ejes Temáticos / Líneas de Investigación Dinámicas */}

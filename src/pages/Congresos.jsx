@@ -119,12 +119,24 @@ export default function Congresos() {
             </span>
           ),
           Año: <span className="font-medium text-zinc-700 dark:text-zinc-300">{c.anio}</span>,
-          Fechas: (
-            <div className="text-xs text-zinc-600 dark:text-zinc-400 font-mono">
-              <div>{c.fecha_inicio || "Por definir"}</div>
-              <div className="text-zinc-400 dark:text-zinc-500">al {c.fecha_fin || "Por definir"}</div>
-            </div>
-          ),
+          Fechas: (() => {
+            const isPast = c.fecha_fin ? new Date(c.fecha_fin + "T23:59:59") < new Date() : false;
+            return (
+              <div className="text-xs text-zinc-600 dark:text-zinc-400 font-mono">
+                <div>{c.fecha_inicio || "Por definir"}</div>
+                <div className="text-zinc-400 dark:text-zinc-500">al {c.fecha_fin || "Por definir"}</div>
+                {isPast ? (
+                  <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border border-zinc-200 dark:border-zinc-700">
+                    Concluido
+                  </span>
+                ) : (
+                  <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                    Vigente
+                  </span>
+                )}
+              </div>
+            );
+          })(),
           Acciones: (
             <div className="flex items-center gap-1.5">
               <button

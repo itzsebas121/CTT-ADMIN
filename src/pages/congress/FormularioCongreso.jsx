@@ -15,6 +15,7 @@ import {
   StepSessions,
   StepSponsors,
   CreateSponsorModal,
+  CreateSpeakerModal,
 } from "../../components/congress";
 import {
   getCongressById,
@@ -23,6 +24,7 @@ import {
   uploadCongressPoster,
   checkCongressEdition,
   getSponsorsList,
+  getSpeakersList,
 } from "../../api/congresses";
 import api from "../../api/api";
 import { useDashboardTheme } from "../../context/DashboardThemeContext";
@@ -40,8 +42,10 @@ export default function FormularioCongreso() {
   const [submitError, setSubmitError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
 
-  // Modal para registrar una empresa patrocinadora en tiempo real
+  // Modales para registrar entidades al vuelo
   const [isSponsorModalOpen, setIsSponsorModalOpen] = useState(false);
+  const [isSpeakerModalOpen, setIsSpeakerModalOpen] = useState(false);
+  const [activeSessionIndexForSpeaker, setActiveSessionIndexForSpeaker] = useState(null);
 
   // Datos principales del congreso
   const [formData, setFormData] = useState({
@@ -53,6 +57,13 @@ export default function FormularioCongreso() {
     descripcion_general: "",
     poster_cover_url: "",
     lugar_sede: "Campus Huachi - Auditorio Central de la FISEI, Ambato",
+    modalidad: "Presencial",
+    duracion_horas: 40,
+    sitio_web_oficial: "",
+    cupo_maximo: 250,
+    costo_estudiante_uta: 0,
+    costo_profesional: 0,
+    costo_ponente: 0,
   });
 
   // Ejes temáticos y público objetivo dinámicos (enriquecen la experiencia)
@@ -120,15 +131,43 @@ export default function FormularioCongreso() {
             descripcion_general: c.descripcion_general || "",
             poster_cover_url: c.poster_cover_url || "",
             lugar_sede: c.lugar_sede || "Campus Huachi - Auditorio Central de la FISEI, Ambato",
+            modalidad: c.modalidad || "Presencial",
+            duracion_horas: c.duracion_horas || 40,
+            sitio_web_oficial: c.sitio_web_oficial || "",
+            cupo_maximo: c.cupo_maximo || 250,
+            costo_estudiante_uta: c.costo_estudiante_uta || 0,
+            costo_profesional: c.costo_profesional || 0,
+            costo_ponente: c.costo_ponente || 0,
           });
           if (c.poster_cover_url) {
             setPosterPreview(c.poster_cover_url);
           }
-          if (Array.isArray(data.sessions)) {
-            setSessions(data.sessions);
+          const loadedSessions = data.sesiones || data.sessions || [];
+          if (Array.isArray(loadedSessions) && loadedSessions.length > 0) {
+            setSessions(
+              loadedSessions.map((s) => ({
+                id_sesion: s.id_sesion,
+                fecha: s.fecha || c.fecha_inicio || "",
+                hora_inicio: s.hora_inicio ? s.hora_inicio.slice(0, 5) : "09:00",
+                hora_fin: s.hora_fin ? s.hora_fin.slice(0, 5) : "10:30",
+                titulo_sesion: s.titulo_sesion || "",
+                jornada: s.jornada || "mañana",
+                lugar: s.lugar || c.lugar_sede || "Auditorio FISEI",
+                id_speaker: s.id_speaker || s.speaker?.id_speaker || "",
+              }))
+            );
           }
-          if (Array.isArray(data.sponsors)) {
-            setSponsors(data.sponsors);
+          const loadedSponsors = data.sponsors || [];
+          if (Array.isArray(loadedSponsors) && loadedSponsors.length > 0) {
+            setSponsors(
+              loadedSponsors.map((sp) => ({
+                id_sponsor: sp.id_sponsor || sp.id,
+                categoria: sp.categoria || "oro",
+                aporte: sp.aporte || 0,
+                nombre: sp.sponsor_name || sp.nombre || "",
+                logo_url: sp.logo_url || "",
+              }))
+            );
           }
         } catch (err) {
           setSubmitError(`Error al cargar el congreso: ${err.message}`);
@@ -146,13 +185,13 @@ export default function FormularioCongreso() {
     const fetchCatalogs = async () => {
       try {
         setLoadingCatalogs(true);
-        const [spkRes, spoList] = await Promise.allSettled([
-          api.get("/speakers", { params: { page_size: 100 } }),
+        const [spkList, spoList] = await Promise.allSettled([
+          getSpeakersList(1, 100),
           getSponsorsList(1, 100),
         ]);
 
-        if (spkRes.status === "fulfilled" && spkRes.value?.data) {
-          const list = spkRes.value.data.speakers || spkRes.value.data || [];
+        if (spkList.status === "fulfilled") {
+          const list = spkList.value;
           setAvailableSpeakers(Array.isArray(list) ? list : []);
         }
         if (spoList.status === "fulfilled") {
@@ -369,6 +408,19 @@ export default function FormularioCongreso() {
     ]);
   };
 
+  const handleOpenSpeakerModal = (sessionIndex) => {
+    setActiveSessionIndexForSpeaker(sessionIndex);
+    setIsSpeakerModalOpen(true);
+  };
+
+  const handleSpeakerCreated = (newSpeaker) => {
+    const newId = newSpeaker.id_speaker || newSpeaker.id;
+    setAvailableSpeakers((prev) => [newSpeaker, ...prev]);
+    if (activeSessionIndexForSpeaker !== null && activeSessionIndexForSpeaker >= 0) {
+      handleSessionChange(activeSessionIndexForSpeaker, "id_speaker", newId);
+    }
+  };
+
   // Validaciones rigurosas por paso (Pydantic / Postgres / Controller)
   const validateStep = (s) => {
     const errors = {};
@@ -541,34 +593,46 @@ export default function FormularioCongreso() {
         fecha_fin: formData.fecha_fin,
         descripcion_general: formData.descripcion_general.trim(),
         poster_cover_url: finalPosterUrl,
+        lugar_sede: formData.lugar_sede?.trim() || "Campus Huachi - Auditorio Central de la FISEI, Ambato",
+        modalidad: formData.modalidad || "Presencial",
+        duracion_horas: parseInt(formData.duracion_horas, 10) || 40,
+        sitio_web_oficial: formData.sitio_web_oficial?.trim() || "",
+        cupo_maximo: parseInt(formData.cupo_maximo, 10) || 250,
+        costo_estudiante_uta: parseFloat(formData.costo_estudiante_uta) || 0.0,
+        costo_profesional: parseFloat(formData.costo_profesional) || 0.0,
+        costo_ponente: parseFloat(formData.costo_ponente) || 0.0,
       };
 
+      // Filtrar y formatear sesiones
+      const validSessions = sessions
+        .filter((s) => s.id_speaker && Number(s.id_speaker) > 0)
+        .map((s) => ({
+          fecha: s.fecha || formData.fecha_inicio,
+          hora_inicio: s.hora_inicio.length === 5 ? `${s.hora_inicio}:00` : s.hora_inicio,
+          hora_fin: s.hora_fin.length === 5 ? `${s.hora_fin}:00` : s.hora_fin,
+          titulo_sesion: s.titulo_sesion.trim(),
+          jornada: String(s.jornada || "mañana").toLowerCase().trim(),
+          lugar: (s.lugar || formData.lugar_sede || "Auditorio FISEI").trim(),
+          id_speaker: parseInt(s.id_speaker, 10),
+        }));
+
+      // Filtrar y formatear patrocinadores
+      const validSponsors = sponsors
+        .filter((sp) => sp.id_sponsor && Number(sp.id_sponsor) > 0)
+        .map((sp) => ({
+          id_sponsor: parseInt(sp.id_sponsor, 10),
+          categoria: String(sp.categoria || "oro").toLowerCase().trim(),
+          aporte: Number(sp.aporte) || 0,
+        }));
+
       if (isEdit) {
-        await updateCongress(id, { congress: congressPayload });
-        toast.success("¡Congreso actualizado exitosamente!");
+        await updateCongress(id, {
+          congress: congressPayload,
+          sponsors: validSponsors,
+          sessions: validSessions,
+        });
+        toast.success("¡Congreso, sesiones y auspiciantes actualizados exitosamente!");
       } else {
-        // Filtrar y formatear sesiones
-        const validSessions = sessions
-          .filter((s) => s.id_speaker && Number(s.id_speaker) > 0)
-          .map((s) => ({
-            fecha: s.fecha || formData.fecha_inicio,
-            hora_inicio: s.hora_inicio.length === 5 ? `${s.hora_inicio}:00` : s.hora_inicio,
-            hora_fin: s.hora_fin.length === 5 ? `${s.hora_fin}:00` : s.hora_fin,
-            titulo_sesion: s.titulo_sesion.trim(),
-            jornada: String(s.jornada || "mañana").toLowerCase().trim(),
-            lugar: (s.lugar || formData.lugar_sede || "Auditorio FISEI").trim(),
-            id_speaker: parseInt(s.id_speaker, 10),
-          }));
-
-        // Filtrar y formatear patrocinadores
-        const validSponsors = sponsors
-          .filter((sp) => sp.id_sponsor && Number(sp.id_sponsor) > 0)
-          .map((sp) => ({
-            id_sponsor: parseInt(sp.id_sponsor, 10),
-            categoria: String(sp.categoria || "oro").toLowerCase().trim(),
-            aporte: Number(sp.aporte) || 0,
-          }));
-
         await createCongress({
           congress: congressPayload,
           sponsors: validSponsors,
@@ -764,6 +828,7 @@ export default function FormularioCongreso() {
             availableSpeakers={availableSpeakers}
             formData={formData}
             validationErrors={validationErrors}
+            onOpenSpeakerModal={handleOpenSpeakerModal}
           />
         )}
 
@@ -868,6 +933,13 @@ export default function FormularioCongreso() {
         isOpen={isSponsorModalOpen}
         onClose={() => setIsSponsorModalOpen(false)}
         onCreated={handleSponsorCreated}
+      />
+
+      {/* Modal para registrar un ponente directamente sin salir */}
+      <CreateSpeakerModal
+        isOpen={isSpeakerModalOpen}
+        onClose={() => setIsSpeakerModalOpen(false)}
+        onCreated={handleSpeakerCreated}
       />
     </div>
   );

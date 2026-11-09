@@ -313,3 +313,55 @@ export const createSponsor = async (sponsorData) => {
     throw new Error(`Error de red: ${error.message}`);
   }
 };
+
+/**
+ * Obtener lista de todos los ponentes registrados en el catálogo general
+ */
+export const getSpeakersList = async (page = 1, pageSize = 100) => {
+  try {
+    const response = await api.get('/speakers', {
+      params: { page, page_size: pageSize }
+    });
+    return response.data?.speakers || response.data?.items || response.data || [];
+  } catch (error) {
+    return [];
+  }
+};
+
+/**
+ * Crear un nuevo ponente en el catálogo general
+ * @param {Object} speakerData - { nombres_completos, titulo_academico, institucion, pais, foto_url, tipo_speaker }
+ */
+export const createSpeaker = async (speakerData) => {
+  try {
+    const payload = speakerData.speaker ? speakerData : { speaker: speakerData };
+    const response = await api.post('/speakers', payload);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const detail = error.response.data?.detail;
+      const message =
+        typeof detail === 'string'
+          ? detail
+          : Array.isArray(detail)
+          ? detail.map((d) => d.msg || JSON.stringify(d)).join(', ')
+          : 'Error al registrar ponente';
+      throw new Error(message);
+    }
+    throw new Error(`Error de red: ${error.message}`);
+  }
+};
+
+/**
+ * Subir fotografía de un ponente
+ * @param {File} file
+ */
+export const uploadSpeakerPhoto = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/images/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+

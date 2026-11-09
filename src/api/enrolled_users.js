@@ -76,3 +76,13 @@ export const getCongressEnrolledUsers = async (
   return response.data;
 };
 
+/**
+ * Actualiza el estado de una inscripción (PAGADO, FACTURADO, INTERESADO, ANULADO)
+ * Endpoint: PUT /api/v1/enrollments/{enrollment_id}
+ */
+export const updateEnrollmentStatus = async (enrollmentId, status) => {
+  const response = await api.put(`/enrollments/${enrollmentId}`, { status });
+  return response.data;
+};
+
+

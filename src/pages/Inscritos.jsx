@@ -8,6 +8,7 @@ import { getEnrolledUsers } from "../api/enrolled_users";
 import { getCourseById } from "../api/courses";
 import { resolveImageUrl } from "../utils/helpers";
 import { useDashboardTheme } from "../context/DashboardThemeContext";
+import ValidatePaymentModal from "../components/enrollment/ValidatePaymentModal";
 
 const headers = ["id", "nombre", "email", "celular", "estado", "fecha_inscripcion", "acciones"];
 
@@ -42,6 +43,8 @@ export default function Inscritos() {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState(null);
+  const [selectedEnrollment, setSelectedEnrollment] = useState(null);
+  const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
 
   // Cargar título del curso si no viene por location.state
   useEffect(() => {
@@ -101,26 +104,26 @@ export default function Inscritos() {
             fecha_inscripcion: formattedDate,
             acciones: (
               <div className="flex items-center justify-end gap-2">
-                {enrollment.payment_order_url ? (
-                  <a
-                    href={resolveImageUrl(enrollment.payment_order_url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`h-8 px-2.5 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1.5 border text-xs font-medium ${
-                      isDark
-                        ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border-white/10"
-                        : "bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-900 border-zinc-200"
-                    }`}
-                    title="Ver orden o comprobante de pago"
-                  >
-                    <DocumentTextIcon className="h-4 w-4 text-[#00345e] dark:text-blue-400" />
-                    <span>Comprobante</span>
-                  </a>
-                ) : (
-                  <span className={`text-xs ${isDark ? "text-zinc-500" : "text-zinc-400"}`}>
-                    Sin comprobante
-                  </span>
-                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedEnrollment(enrollment);
+                    setIsValidationModalOpen(true);
+                  }}
+                  className={`h-8 px-2.5 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1.5 border text-xs font-medium ${
+                    enrollment.payment_order_url
+                      ? isDark
+                        ? "bg-zinc-800 hover:bg-zinc-700 text-blue-300 hover:text-white border-blue-500/30"
+                        : "bg-blue-50 hover:bg-blue-100 text-[#00345e] border-blue-200"
+                      : isDark
+                        ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border-white/10"
+                        : "bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-900 border-zinc-200"
+                  }`}
+                  title={enrollment.payment_order_url ? "Revisar comprobante y auditar pago" : "Gestionar estado de inscripción"}
+                >
+                  <DocumentTextIcon className="h-4 w-4 text-[#00345e] dark:text-blue-400" />
+                  <span>{enrollment.payment_order_url ? "Revisar Pago" : "Gestionar"}</span>
+                </button>
               </div>
             ),
           };
@@ -254,6 +257,13 @@ export default function Inscritos() {
           {error}
         </div>
       )}
+
+      <ValidatePaymentModal
+        isOpen={isValidationModalOpen}
+        onClose={() => setIsValidationModalOpen(false)}
+        enrollment={selectedEnrollment}
+        onStatusUpdated={() => loadEnrolledUsers(page, pageSize, searchQuery, statusFilter)}
+      />
     </TablePageLayout>
   );
 }

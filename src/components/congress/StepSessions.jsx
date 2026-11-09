@@ -16,6 +16,7 @@ export default function StepSessions({
   availableSpeakers,
   formData,
   validationErrors = {},
+  onOpenSpeakerModal,
 }) {
   return (
     <div className="space-y-5">
@@ -126,9 +127,20 @@ export default function StepSessions({
 
                   {/* Ponente Asignado */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                      Ponente Asignado <span className="text-red-500">*</span>
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                        Ponente Asignado <span className="text-red-500">*</span>
+                      </label>
+                      {onOpenSpeakerModal && (
+                        <button
+                          type="button"
+                          onClick={() => onOpenSpeakerModal(index)}
+                          className="text-[11px] font-semibold text-[#00345e] dark:text-blue-400 hover:underline cursor-pointer flex items-center gap-1"
+                        >
+                          + Registrar nuevo ponente
+                        </button>
+                      )}
+                    </div>
                     <div className="relative">
                       <select
                         value={sess.id_speaker || ""}
